@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dtsInsumos" targetNamespace="http://tempuri.org/dtsInsumos.xsd" xmlns:mstns="http://tempuri.org/dtsInsumos.xsd" xmlns="http://tempuri.org/dtsInsumos.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="dtsInsumos" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="dtsInsumos" msprop:Generator_UserDSName="dtsInsumos">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Insumos" msprop:Generator_TableClassName="InsumosDataTable" msprop:Generator_TableVarName="tableInsumos" msprop:Generator_TablePropName="Insumos" msprop:Generator_RowDeletingName="InsumosRowDeleting" msprop:Generator_RowChangingName="InsumosRowChanging" msprop:Generator_RowEvHandlerName="InsumosRowChangeEventHandler" msprop:Generator_RowDeletedName="InsumosRowDeleted" msprop:Generator_UserTableName="Insumos" msprop:Generator_RowChangedName="InsumosRowChanged" msprop:Generator_RowEvArgName="InsumosRowChangeEvent" msprop:Generator_RowClassName="InsumosRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="IdInsumo" msprop:Generator_ColumnVarNameInTable="columnIdInsumo" msprop:Generator_ColumnPropNameInRow="IdInsumo" msprop:Generator_ColumnPropNameInTable="IdInsumoColumn" msprop:Generator_UserColumnName="IdInsumo" type="xs:int" minOccurs="0" />
+              <xs:element name="NombreInterno" msprop:Generator_ColumnVarNameInTable="columnNombreInterno" msprop:Generator_ColumnPropNameInRow="NombreInterno" msprop:Generator_ColumnPropNameInTable="NombreInternoColumn" msprop:Generator_UserColumnName="NombreInterno" type="xs:string" minOccurs="0" />
+              <xs:element name="NombreInsumo" msprop:Generator_ColumnVarNameInTable="columnNombreInsumo" msprop:Generator_ColumnPropNameInRow="NombreInsumo" msprop:Generator_ColumnPropNameInTable="NombreInsumoColumn" msprop:Generator_UserColumnName="NombreInsumo" type="xs:string" minOccurs="0" />
+              <xs:element name="NombreProveedor" msprop:Generator_ColumnVarNameInTable="columnNombreProveedor" msprop:Generator_ColumnPropNameInRow="NombreProveedor" msprop:Generator_ColumnPropNameInTable="NombreProveedorColumn" msprop:Generator_UserColumnName="NombreProveedor" type="xs:string" minOccurs="0" />
+              <xs:element name="PrecioUnitario" msprop:Generator_ColumnVarNameInTable="columnPrecioUnitario" msprop:Generator_ColumnPropNameInRow="PrecioUnitario" msprop:Generator_ColumnPropNameInTable="PrecioUnitarioColumn" msprop:Generator_UserColumnName="PrecioUnitario" type="xs:decimal" minOccurs="0" />
+              <xs:element name="NombreMoneda" msprop:Generator_ColumnVarNameInTable="columnNombreMoneda" msprop:Generator_ColumnPropNameInRow="NombreMoneda" msprop:Generator_ColumnPropNameInTable="NombreMonedaColumn" msprop:Generator_UserColumnName="NombreMoneda" type="xs:string" minOccurs="0" />
+              <xs:element name="NombreFamilia" msprop:Generator_ColumnVarNameInTable="columnNombreFamilia" msprop:Generator_ColumnPropNameInRow="NombreFamilia" msprop:Generator_ColumnPropNameInTable="NombreFamiliaColumn" msprop:Generator_UserColumnName="NombreFamilia" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
