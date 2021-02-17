@@ -108,6 +108,7 @@
             this.InicioRibbonPageGroup1.ItemLinks.Add(this.btnGuardar);
             this.InicioRibbonPageGroup1.ItemLinks.Add(this.btnBorrar);
             this.InicioRibbonPageGroup1.Name = "InicioRibbonPageGroup1";
+            this.InicioRibbonPageGroup1.ShowCaptionButton = false;
             this.InicioRibbonPageGroup1.Text = "Inicio";
             // 
             // groupControl1

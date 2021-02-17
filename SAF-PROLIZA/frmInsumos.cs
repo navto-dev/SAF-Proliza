@@ -1,9 +1,9 @@
-﻿using System;
-using System.Data;
-using System.Windows.Forms;
-using CapaNegocios;
+﻿using CapaNegocios;
 using DevExpress.XtraBars;
 using Entidades;
+using System;
+using System.Data;
+using System.Windows.Forms;
 
 namespace SAF_PROLIZA
 {
@@ -14,6 +14,7 @@ namespace SAF_PROLIZA
         bool Guardar = true; //SI la consuta devuelve algo, se convierte a false y no guarda, actualiza.
         int Id = 1;
         #region "Métodos"
+
         public void LlenarDatos(int Id)
         {
             //DataRow row = Objetos.Insumos.ConsultarInsumoPorId(Id).Tables["Insumos"].Rows[0];
@@ -42,6 +43,8 @@ namespace SAF_PROLIZA
         void autoCompleteTextBox()
         {
             //DataTable dt = Insumos.ConsultarInsumoPorProveedor(int.Parse(cmbProveedor.EditValue.ToString())).Tables["Insumos"];
+            if (cmbProveedor.EditValue == null)
+                return;
             DataTable dt = new CNInsumos().ConsultaPorProveedor(int.Parse(cmbProveedor.EditValue.ToString()));
             AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
             foreach (DataRow row in dt.Rows)
@@ -243,17 +246,20 @@ namespace SAF_PROLIZA
                         if (Convert.ToDouble(txtPrecioUnitaio.Text) != PU) //PU=> variable para almacenar el precio unitario del insumo cuando se consulta antes de cualquier edicion.
                             if (Convert.ToDouble(txtPrecioUnitaio.Text) < PU)
                             {
-                                DialogResult ds = MessageBox.Show("El costo del insumo ha bajado.\n" +
+                                if (MessageBox.Show("El costo del insumo ha bajado.\n" +
                                     "¿Deseas actualizar el precio de las fórmulas que contienen este insumo?",
-                                   "Advertencia", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                                if (ds == DialogResult.Yes)
+                                   "Advertencia", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                     ActualizarPreciosFormulas = true;
                             }
                             else
                                 ActualizarPreciosFormulas = true;
-
-                        if (!new CNInsumos().Actualizar(Estaticos.IdUsuario, AsignaGUIObjeto2(), ActualizarPreciosFormulas, out string Msj, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1))
-                            throw new Exception(Msj);
+                        CNInsumos cNInsumos = new CNInsumos(Estaticos.IdUsuario, AsignaGUIObjeto2(), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
+                        using (waitForm frm = new waitForm(cNInsumos.ActualizarP, "Actualizando precio", "Por favor espere, no tardaremos mucho."))
+                        {
+                            frm.ShowDialog(this);
+                        }
+                        if (!cNInsumos.EstadoOperacion)
+                            throw new Exception(cNInsumos.Msj);
                     }
                     else
                         new CNInsumos().Guardar(AsignaGUIObjeto2());

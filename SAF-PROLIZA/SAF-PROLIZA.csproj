@@ -29,10 +29,10 @@
     <ProductName>SAF Proliza</ProductName>
     <PublisherName>Navto MX</PublisherName>
     <SuiteName>SAF Proliza</SuiteName>
-    <MinimumRequiredVersion>1.0.0.9</MinimumRequiredVersion>
+    <MinimumRequiredVersion>1.0.0.12</MinimumRequiredVersion>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.html</WebPage>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -254,6 +254,18 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Seguridad.cs" />
+    <Compile Include="UserControl1.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl1.Designer.cs">
+      <DependentUpon>UserControl1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="waitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="waitForm.Designer.cs">
+      <DependentUpon>waitForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmBuscador.resx">
@@ -323,6 +335,9 @@
     <EmbeddedResource Include="Reportes\rptFormulaDetails.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptFormulaDetails.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="waitForm.resx">
+      <DependentUpon>waitForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
