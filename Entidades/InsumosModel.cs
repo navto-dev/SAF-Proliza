@@ -18,5 +18,10 @@ namespace Entidades
         public DateTime FechaCompra { get; set; }
         public double PrecioUnitario { get; set; }
         public double TotalCompraMX { get; set; }
+        /// <summary>
+        /// Indica si al actualizar el costo del insumo se actualiza formulas y productos
+        /// </summary>
+        public bool ActualizaFormulas { get; set; }
+        public int IdUsuario { get; set; }
     }
 }

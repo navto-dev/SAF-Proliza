@@ -139,7 +139,7 @@ namespace SAF_PROLIZA
         //        Insumos.UnidadMedida = "P";
         //    }
         //}
-        InsumosModel AsignaGUIObjeto2()
+        InsumosModel AsignaGUIObjeto2(bool ActualizarPrecios)
         {
             return new InsumosModel
             {
@@ -153,7 +153,10 @@ namespace SAF_PROLIZA
                 //   txtPrecioUnitaio.Text = "0" + txtPrecioUnitaio.Text,
                 PrecioUnitario = Convert.ToDouble(txtPrecioUnitaio.Text),
                 TotalCompraMX = 1000,
-                UnidadMedida = cmbUnidadMedida.Text.StartsWith("K") ? "KG" : cmbUnidadMedida.Text.StartsWith("L") ? "L" : "P"
+                UnidadMedida = cmbUnidadMedida.Text.StartsWith("K") ? "KG" : cmbUnidadMedida.Text.StartsWith("L") ? "L" : "P",
+                IdUsuario = Estaticos.IdUsuario,
+                ActualizaFormulas = ActualizarPrecios
+                
             };
 
         }
@@ -253,7 +256,7 @@ namespace SAF_PROLIZA
                             }
                             else
                                 ActualizarPreciosFormulas = true;
-                        CNInsumos cNInsumos = new CNInsumos(Estaticos.IdUsuario, AsignaGUIObjeto2(), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
+                        CNInsumos cNInsumos = new CNInsumos(Estaticos.IdUsuario, AsignaGUIObjeto2(ActualizarPreciosFormulas), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
                         using (waitForm frm = new waitForm(cNInsumos.ActualizarP, "Actualizando precio", "Por favor espere, no tardaremos mucho."))
                         {
                             frm.ShowDialog(this);
@@ -262,7 +265,7 @@ namespace SAF_PROLIZA
                             throw new Exception(cNInsumos.Msj);
                     }
                     else
-                        new CNInsumos().Guardar(AsignaGUIObjeto2());
+                        new CNInsumos().Guardar(AsignaGUIObjeto2(true));
 
                     Limpiar();
                     HabilitarCampos(false);
