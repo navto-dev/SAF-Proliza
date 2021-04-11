@@ -115,6 +115,20 @@ namespace CapaNegocios
 
             return res;
         }
+        public int Respaldo(string ruta)
+        {
+            int res;
+            try
+            {
+                res = new CDUsuarios().GuardarRespaldo(ruta);
+            }
+            catch (Exception)
+            {
+                res = 0;
+            }
+
+            return res;
+        }
         public DataTable ConsultaRespaldoFecha(int Mes, int anio)
         {
             try

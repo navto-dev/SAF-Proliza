@@ -22,7 +22,28 @@ namespace CapaNegocios
                     File.Move(sourceFile, destinationFile);
                 }
             }
-
+        }
+        public static bool RespaldoMes()
+        {
+            var dateTosearch = DateTime.Now.AddMonths(-1);
+            int Mes = dateTosearch.Month;
+            int anio = dateTosearch.Year;
+            return new CNUsuarios().ConsultaRespaldoFecha(Mes, anio).Rows.Count != 0;
+        }
+        public static bool createRespaldo(string Directory, out string Msj)
+        {
+            try
+            {
+                if (new CNUsuarios().Respaldo(Directory) == 0)
+                    throw new Exception("Error al crear el respaldo. Contacte al administrador de sistemas.");
+                Msj = "";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Msj = ex.Message;
+                return false;
+            }
         }
 
     }

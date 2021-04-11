@@ -267,6 +267,30 @@ namespace CapaDatos
 
             return res;
         }
+        public int GuardarRespaldo(string ruta)
+        {
+            int res;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(AConexion.con))
+                {
+                    using (SqlCommand cmd = new SqlCommand("spRespaldo", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@Ruta", SqlDbType.NVarChar).Value = ruta;
+                        con.Open();
+                        res = Convert.ToInt32(cmd.ExecuteScalar());
+                        con.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error: " + ex.Message);
+            }
+
+            return res;
+        }
         public DataTable ConsultaGridRespaldoPorFecha(int Mes, int anio)
         {
             DataTable tabla = new DataTable();

@@ -14,7 +14,7 @@
         ////public static BLL.BLLTipoDeCambio TipoDeCambio = new BLL.BLLTipoDeCambio(BLL.Gral.gStrConexion, BLL.Gral.gStrUsuario);
         ////public static BLL.BLLUsuario Usuario = new BLL.BLLUsuario(BLL.Gral.gStrConexion, BLL.Gral.gStrUsuario);
         //public static BLL.ActualizaFormulas ActualizaFormulas = new BLL.ActualizaFormulas();
-        //public static BLL.MoverRespaldo MoverRespaldo = new BLL.MoverRespaldo();
+        public static CapaNegocios.BackupGenerator MoverRespaldo = new CapaNegocios.BackupGenerator();
         //public static BLL.Reporteador Reporteador = new BLL.Reporteador();
         public static string Nombre;
         public static bool Activo;

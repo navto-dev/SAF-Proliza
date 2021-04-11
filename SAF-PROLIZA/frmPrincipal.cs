@@ -7,6 +7,8 @@ using DevExpress.Utils;
 using CapaNegocios;
 using System.Deployment.Application;
 using System.Drawing;
+using System.IO;
+using System.Diagnostics;
 
 namespace SAF_PROLIZA
 {
@@ -596,7 +598,6 @@ namespace SAF_PROLIZA
         }
         private void frmPrincipal_Load(object sender, EventArgs e)
         {
-            //Objetos.MoverRespaldo.SimpleFileMove();
             frmLogin frm = new frmLogin();
             DialogResult dr = new DialogResult();
             dr = frm.ShowDialog();
@@ -626,6 +627,29 @@ namespace SAF_PROLIZA
                         EstadoGrid = "F";
                         llenarGrid("F");
                         break;
+                }
+
+                if (!BackupGenerator.RespaldoMes())
+                {
+                    if (MessageBox.Show("No se ha creado un respaldo de información para el mes anterior.\n ¿Deseas crearlo ahora?", "Alerta Respaldo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        //using (var fbd = new FolderBrowserDialog())
+                        //{
+                        //    DialogResult result = fbd.ShowDialog();
+
+                        //    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                        //    {
+                        Directory.CreateDirectory(@"C:\SAF-PROLIZA");
+                        if (BackupGenerator.createRespaldo("", out string Msj))
+                            if (MessageBox.Show("Respaldo creado con exito. ¿Deseas visualizarlo ahora?", "Información", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                                Process.Start(@"C:\SAF-PROLIZA");
+                            else
+                            {
+                                MessageBox.Show(Msj, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        //    }
+                        //}
+                    }
                 }
             }
             else
