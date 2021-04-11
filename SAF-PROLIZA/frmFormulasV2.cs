@@ -120,13 +120,13 @@ namespace SAF_PROLIZA
                 if (MessageBox.Show("No se ha agregado ningun insumo a la elaboración de la fórmula.\n¿Desea continuar con el guardado de la fórmula?", "Advertencia", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                     return false;
             }
-            if (string.IsNullOrEmpty(txtFormula.Text))
+            if (string.IsNullOrEmpty(txtFormula.Text)||string.IsNullOrWhiteSpace(txtFormula.Text))
             {
                 toolTipController1.ShowHint("Debes capturar el nombre de la fórmula", "Este Campo No Puede Quedar en Blanco", txtFormula, DevExpress.Utils.ToolTipLocation.TopRight);
                 txtFormula.Focus();
                 return false;
             }
-            if (string.IsNullOrEmpty(txtCantidad.Text))
+            if (string.IsNullOrEmpty(txtCantidad.Text) || string.IsNullOrWhiteSpace(txtCantidad.Text))
             {
                 toolTipController1.ShowHint("Debes capturar la cantidad de producción de la fórmula.", "Este Campo No Puede Quedar en Blanco", txtCantidad, DevExpress.Utils.ToolTipLocation.TopRight);
                 txtCantidad.Focus();

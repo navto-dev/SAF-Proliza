@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="eedb205277d54537b25f384eb55aceb6" Name="Diagram1">
+        <EntityTypeShape EntityType="sdproliza_devModel.DetallesFormulas" Width="1.5" PointX="5.25" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.DetallesProductos" Width="1.5" PointX="8.25" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.FamiliaFormulas" Width="1.5" PointX="0.75" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.FamiliaInsumos" Width="1.5" PointX="0.75" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.Formulas" Width="1.5" PointX="3" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.Insumos" Width="1.5" PointX="3" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="sdproliza_devModel.ProductosTerminados" Width="1.5" PointX="6" PointY="8.5" IsExpanded="true" />
+        <AssociationConnector Association="sdproliza_devModel.FK_DetallesFormulas_Formulas" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_DetallesFormulas_Insumos" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_DetallesProductos_Insumos" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_DetallesProductos_ProductosTerminados" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_Formulas_FamiliaFormulas" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_Insumos_FamiliaInsumos" ManuallyRouted="false" />
+        <AssociationConnector Association="sdproliza_devModel.FK_ProductosTerminados_Formulas" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

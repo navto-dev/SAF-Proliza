@@ -173,19 +173,19 @@ namespace SAF_PROLIZA
         }
         bool ValidaGUI()
         {
-            if (String.IsNullOrEmpty(txtNombreInsumo.Text))
+            if (String.IsNullOrEmpty(txtNombreInsumo.Text) || string.IsNullOrWhiteSpace(txtNombreInsumo.Text))
             {
                 MessageBox.Show("Ingresa el nombre del Insumo", "Faltan Datos", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 txtNombreInsumo.Focus();
                 return false;
             }
-            if (String.IsNullOrEmpty(txtNombreInterno.Text))
+            if (String.IsNullOrEmpty(txtNombreInterno.Text) || string.IsNullOrWhiteSpace(txtNombreInterno.Text))
             {
                 MessageBox.Show("Ingresa el nombre interno del Insumo", "Faltan Datos", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 txtNombreInterno.Focus();
                 return false;
             }
-            if (String.IsNullOrEmpty(txtPrecioUnitaio.Text))
+            if (String.IsNullOrEmpty(txtPrecioUnitaio.Text) || string.IsNullOrWhiteSpace(txtPrecioUnitaio.Text))
             {
                 MessageBox.Show("El precio del Insumo no puede quedar en ceros.", "Faltan Datos", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 txtPrecioUnitaio.Focus();

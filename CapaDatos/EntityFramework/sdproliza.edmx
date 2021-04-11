@@ -1,0 +1,571 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="sdproliza_devModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="DetallesFormulas">
+          <Key>
+            <PropertyRef Name="IdDetalle" />
+            <PropertyRef Name="IdFormula" />
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdDetalle" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdFormula" Type="int" Nullable="false" />
+          <Property Name="IdInsumo" Type="int" Nullable="false" />
+          <Property Name="CantidadInsumo" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="UnidadMedidaInsumo" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="CostoInsumo" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+          <Property Name="IdUsuarioCreo" Type="int" />
+          <Property Name="FechaCreo" Type="datetime" />
+          <Property Name="IdUsuarioModifica" Type="int" />
+          <Property Name="FechaModifica" Type="datetime" />
+        </EntityType>
+        <EntityType Name="DetallesProductos">
+          <Key>
+            <PropertyRef Name="IdDetalle" />
+            <PropertyRef Name="IdProducto" />
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdDetalle" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdProducto" Type="int" Nullable="false" />
+          <Property Name="IdInsumo" Type="int" Nullable="false" />
+          <Property Name="CostoInsumo" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FamiliaFormulas">
+          <Key>
+            <PropertyRef Name="IdFamilia" />
+          </Key>
+          <Property Name="IdFamilia" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreFamilia" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="FamiliaInsumos">
+          <Key>
+            <PropertyRef Name="IdFamilia" />
+          </Key>
+          <Property Name="IdFamilia" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreFamilia" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Formulas">
+          <Key>
+            <PropertyRef Name="IdFormula" />
+          </Key>
+          <Property Name="IdFormula" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreFormula" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="FechaElaboracion" Type="datetime" Nullable="false" />
+          <Property Name="Cantidad" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Capacidad" Type="varchar" MaxLength="50" />
+          <Property Name="UnidadMedida" Type="nvarchar" MaxLength="20" />
+          <Property Name="CostoTotal" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="IdFamilia" Type="int" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Insumos">
+          <Key>
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdInsumo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdProveedor" Type="int" Nullable="false" />
+          <Property Name="NombreInsumo" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="NombreInterno" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="UnidadMedida" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="PrecioUnitario" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="TotalCompraMX" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="FechaCompra" Type="datetime" Nullable="false" />
+          <Property Name="IdFamilia" Type="int" Nullable="false" />
+          <Property Name="IdMoneda" Type="int" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProductosTerminados">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdFormula" Type="int" Nullable="false" />
+          <Property Name="NombreProducto" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Cantidad" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="UnidadMedida" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CostoUnitario" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="CostoTotalProducto" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+          <Property Name="IdUsuarioCreo" Type="int" />
+          <Property Name="FechaCreo" Type="datetime" />
+          <Property Name="IdUsuarioModifica" Type="int" />
+          <Property Name="FechaModifica" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_DetallesFormulas_Formulas">
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="1" />
+          <End Role="DetallesFormulas" Type="Self.DetallesFormulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Formulas">
+              <PropertyRef Name="IdFormula" />
+            </Principal>
+            <Dependent Role="DetallesFormulas">
+              <PropertyRef Name="IdFormula" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesFormulas_Insumos">
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="1" />
+          <End Role="DetallesFormulas" Type="Self.DetallesFormulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Insumos">
+              <PropertyRef Name="IdInsumo" />
+            </Principal>
+            <Dependent Role="DetallesFormulas">
+              <PropertyRef Name="IdInsumo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesProductos_Insumos">
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="1" />
+          <End Role="DetallesProductos" Type="Self.DetallesProductos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Insumos">
+              <PropertyRef Name="IdInsumo" />
+            </Principal>
+            <Dependent Role="DetallesProductos">
+              <PropertyRef Name="IdInsumo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesProductos_ProductosTerminados">
+          <End Role="ProductosTerminados" Type="Self.ProductosTerminados" Multiplicity="1" />
+          <End Role="DetallesProductos" Type="Self.DetallesProductos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductosTerminados">
+              <PropertyRef Name="IdProducto" />
+            </Principal>
+            <Dependent Role="DetallesProductos">
+              <PropertyRef Name="IdProducto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Formulas_FamiliaFormulas">
+          <End Role="FamiliaFormulas" Type="Self.FamiliaFormulas" Multiplicity="1" />
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamiliaFormulas">
+              <PropertyRef Name="IdFamilia" />
+            </Principal>
+            <Dependent Role="Formulas">
+              <PropertyRef Name="IdFamilia" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Insumos_FamiliaInsumos">
+          <End Role="FamiliaInsumos" Type="Self.FamiliaInsumos" Multiplicity="1" />
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamiliaInsumos">
+              <PropertyRef Name="IdFamilia" />
+            </Principal>
+            <Dependent Role="Insumos">
+              <PropertyRef Name="IdFamilia" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductosTerminados_Formulas">
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="1" />
+          <End Role="ProductosTerminados" Type="Self.ProductosTerminados" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Formulas">
+              <PropertyRef Name="IdFormula" />
+            </Principal>
+            <Dependent Role="ProductosTerminados">
+              <PropertyRef Name="IdFormula" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="sdproliza_devModelStoreContainer">
+          <EntitySet Name="DetallesFormulas" EntityType="Self.DetallesFormulas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DetallesProductos" EntityType="Self.DetallesProductos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FamiliaFormulas" EntityType="Self.FamiliaFormulas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FamiliaInsumos" EntityType="Self.FamiliaInsumos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Formulas" EntityType="Self.Formulas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Insumos" EntityType="Self.Insumos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductosTerminados" EntityType="Self.ProductosTerminados" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_DetallesFormulas_Formulas" Association="Self.FK_DetallesFormulas_Formulas">
+            <End Role="Formulas" EntitySet="Formulas" />
+            <End Role="DetallesFormulas" EntitySet="DetallesFormulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesFormulas_Insumos" Association="Self.FK_DetallesFormulas_Insumos">
+            <End Role="Insumos" EntitySet="Insumos" />
+            <End Role="DetallesFormulas" EntitySet="DetallesFormulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesProductos_Insumos" Association="Self.FK_DetallesProductos_Insumos">
+            <End Role="Insumos" EntitySet="Insumos" />
+            <End Role="DetallesProductos" EntitySet="DetallesProductos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesProductos_ProductosTerminados" Association="Self.FK_DetallesProductos_ProductosTerminados">
+            <End Role="ProductosTerminados" EntitySet="ProductosTerminados" />
+            <End Role="DetallesProductos" EntitySet="DetallesProductos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Formulas_FamiliaFormulas" Association="Self.FK_Formulas_FamiliaFormulas">
+            <End Role="FamiliaFormulas" EntitySet="FamiliaFormulas" />
+            <End Role="Formulas" EntitySet="Formulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Insumos_FamiliaInsumos" Association="Self.FK_Insumos_FamiliaInsumos">
+            <End Role="FamiliaInsumos" EntitySet="FamiliaInsumos" />
+            <End Role="Insumos" EntitySet="Insumos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductosTerminados_Formulas" Association="Self.FK_ProductosTerminados_Formulas">
+            <End Role="Formulas" EntitySet="Formulas" />
+            <End Role="ProductosTerminados" EntitySet="ProductosTerminados" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="sdproliza_devModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="DetallesFormulas">
+          <Key>
+            <PropertyRef Name="IdDetalle" />
+            <PropertyRef Name="IdFormula" />
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdDetalle" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdFormula" Type="Int32" Nullable="false" />
+          <Property Name="IdInsumo" Type="Int32" Nullable="false" />
+          <Property Name="CantidadInsumo" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="UnidadMedidaInsumo" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CostoInsumo" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <Property Name="IdUsuarioCreo" Type="Int32" />
+          <Property Name="FechaCreo" Type="DateTime" Precision="3" />
+          <Property Name="IdUsuarioModifica" Type="Int32" />
+          <Property Name="FechaModifica" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Formulas" Relationship="Self.FK_DetallesFormulas_Formulas" FromRole="DetallesFormulas" ToRole="Formulas" />
+          <NavigationProperty Name="Insumos" Relationship="Self.FK_DetallesFormulas_Insumos" FromRole="DetallesFormulas" ToRole="Insumos" />
+        </EntityType>
+        <EntityType Name="DetallesProductos">
+          <Key>
+            <PropertyRef Name="IdDetalle" />
+            <PropertyRef Name="IdProducto" />
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdDetalle" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdProducto" Type="Int32" Nullable="false" />
+          <Property Name="IdInsumo" Type="Int32" Nullable="false" />
+          <Property Name="CostoInsumo" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <NavigationProperty Name="Insumos" Relationship="Self.FK_DetallesProductos_Insumos" FromRole="DetallesProductos" ToRole="Insumos" />
+          <NavigationProperty Name="ProductosTerminados" Relationship="Self.FK_DetallesProductos_ProductosTerminados" FromRole="DetallesProductos" ToRole="ProductosTerminados" />
+        </EntityType>
+        <EntityType Name="FamiliaFormulas">
+          <Key>
+            <PropertyRef Name="IdFamilia" />
+          </Key>
+          <Property Name="IdFamilia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreFamilia" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Formulas" Relationship="Self.FK_Formulas_FamiliaFormulas" FromRole="FamiliaFormulas" ToRole="Formulas" />
+        </EntityType>
+        <EntityType Name="FamiliaInsumos">
+          <Key>
+            <PropertyRef Name="IdFamilia" />
+          </Key>
+          <Property Name="IdFamilia" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreFamilia" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Insumos" Relationship="Self.FK_Insumos_FamiliaInsumos" FromRole="FamiliaInsumos" ToRole="Insumos" />
+        </EntityType>
+        <EntityType Name="Formulas">
+          <Key>
+            <PropertyRef Name="IdFormula" />
+          </Key>
+          <Property Name="IdFormula" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreFormula" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FechaElaboracion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Cantidad" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Capacidad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UnidadMedida" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="CostoTotal" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="IdFamilia" Type="Int32" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="DetallesFormulas" Relationship="Self.FK_DetallesFormulas_Formulas" FromRole="Formulas" ToRole="DetallesFormulas" />
+          <NavigationProperty Name="FamiliaFormulas" Relationship="Self.FK_Formulas_FamiliaFormulas" FromRole="Formulas" ToRole="FamiliaFormulas" />
+          <NavigationProperty Name="ProductosTerminados" Relationship="Self.FK_ProductosTerminados_Formulas" FromRole="Formulas" ToRole="ProductosTerminados" />
+        </EntityType>
+        <EntityType Name="Insumos">
+          <Key>
+            <PropertyRef Name="IdInsumo" />
+          </Key>
+          <Property Name="IdInsumo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdProveedor" Type="Int32" Nullable="false" />
+          <Property Name="NombreInsumo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NombreInterno" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UnidadMedida" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PrecioUnitario" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="TotalCompraMX" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="FechaCompra" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IdFamilia" Type="Int32" Nullable="false" />
+          <Property Name="IdMoneda" Type="Int32" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="DetallesFormulas" Relationship="Self.FK_DetallesFormulas_Insumos" FromRole="Insumos" ToRole="DetallesFormulas" />
+          <NavigationProperty Name="DetallesProductos" Relationship="Self.FK_DetallesProductos_Insumos" FromRole="Insumos" ToRole="DetallesProductos" />
+          <NavigationProperty Name="FamiliaInsumos" Relationship="Self.FK_Insumos_FamiliaInsumos" FromRole="Insumos" ToRole="FamiliaInsumos" />
+        </EntityType>
+        <EntityType Name="ProductosTerminados">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdFormula" Type="Int32" Nullable="false" />
+          <Property Name="NombreProducto" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Cantidad" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="UnidadMedida" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CostoUnitario" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="CostoTotalProducto" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <Property Name="IdUsuarioCreo" Type="Int32" />
+          <Property Name="FechaCreo" Type="DateTime" Precision="3" />
+          <Property Name="IdUsuarioModifica" Type="Int32" />
+          <Property Name="FechaModifica" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="DetallesProductos" Relationship="Self.FK_DetallesProductos_ProductosTerminados" FromRole="ProductosTerminados" ToRole="DetallesProductos" />
+          <NavigationProperty Name="Formulas" Relationship="Self.FK_ProductosTerminados_Formulas" FromRole="ProductosTerminados" ToRole="Formulas" />
+        </EntityType>
+        <Association Name="FK_DetallesFormulas_Formulas">
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="1" />
+          <End Role="DetallesFormulas" Type="Self.DetallesFormulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Formulas">
+              <PropertyRef Name="IdFormula" />
+            </Principal>
+            <Dependent Role="DetallesFormulas">
+              <PropertyRef Name="IdFormula" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesFormulas_Insumos">
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="1" />
+          <End Role="DetallesFormulas" Type="Self.DetallesFormulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Insumos">
+              <PropertyRef Name="IdInsumo" />
+            </Principal>
+            <Dependent Role="DetallesFormulas">
+              <PropertyRef Name="IdInsumo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesProductos_Insumos">
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="1" />
+          <End Role="DetallesProductos" Type="Self.DetallesProductos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Insumos">
+              <PropertyRef Name="IdInsumo" />
+            </Principal>
+            <Dependent Role="DetallesProductos">
+              <PropertyRef Name="IdInsumo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetallesProductos_ProductosTerminados">
+          <End Role="ProductosTerminados" Type="Self.ProductosTerminados" Multiplicity="1" />
+          <End Role="DetallesProductos" Type="Self.DetallesProductos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductosTerminados">
+              <PropertyRef Name="IdProducto" />
+            </Principal>
+            <Dependent Role="DetallesProductos">
+              <PropertyRef Name="IdProducto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Formulas_FamiliaFormulas">
+          <End Role="FamiliaFormulas" Type="Self.FamiliaFormulas" Multiplicity="1" />
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamiliaFormulas">
+              <PropertyRef Name="IdFamilia" />
+            </Principal>
+            <Dependent Role="Formulas">
+              <PropertyRef Name="IdFamilia" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Insumos_FamiliaInsumos">
+          <End Role="FamiliaInsumos" Type="Self.FamiliaInsumos" Multiplicity="1" />
+          <End Role="Insumos" Type="Self.Insumos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FamiliaInsumos">
+              <PropertyRef Name="IdFamilia" />
+            </Principal>
+            <Dependent Role="Insumos">
+              <PropertyRef Name="IdFamilia" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProductosTerminados_Formulas">
+          <End Role="Formulas" Type="Self.Formulas" Multiplicity="1" />
+          <End Role="ProductosTerminados" Type="Self.ProductosTerminados" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Formulas">
+              <PropertyRef Name="IdFormula" />
+            </Principal>
+            <Dependent Role="ProductosTerminados">
+              <PropertyRef Name="IdFormula" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="sdprolizaEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DetallesFormulas" EntityType="Self.DetallesFormulas" />
+          <EntitySet Name="DetallesProductos" EntityType="Self.DetallesProductos" />
+          <EntitySet Name="FamiliaFormulas" EntityType="Self.FamiliaFormulas" />
+          <EntitySet Name="FamiliaInsumos" EntityType="Self.FamiliaInsumos" />
+          <EntitySet Name="Formulas" EntityType="Self.Formulas" />
+          <EntitySet Name="Insumos" EntityType="Self.Insumos" />
+          <EntitySet Name="ProductosTerminados" EntityType="Self.ProductosTerminados" />
+          <AssociationSet Name="FK_DetallesFormulas_Formulas" Association="Self.FK_DetallesFormulas_Formulas">
+            <End Role="Formulas" EntitySet="Formulas" />
+            <End Role="DetallesFormulas" EntitySet="DetallesFormulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesFormulas_Insumos" Association="Self.FK_DetallesFormulas_Insumos">
+            <End Role="Insumos" EntitySet="Insumos" />
+            <End Role="DetallesFormulas" EntitySet="DetallesFormulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesProductos_Insumos" Association="Self.FK_DetallesProductos_Insumos">
+            <End Role="Insumos" EntitySet="Insumos" />
+            <End Role="DetallesProductos" EntitySet="DetallesProductos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetallesProductos_ProductosTerminados" Association="Self.FK_DetallesProductos_ProductosTerminados">
+            <End Role="ProductosTerminados" EntitySet="ProductosTerminados" />
+            <End Role="DetallesProductos" EntitySet="DetallesProductos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Formulas_FamiliaFormulas" Association="Self.FK_Formulas_FamiliaFormulas">
+            <End Role="FamiliaFormulas" EntitySet="FamiliaFormulas" />
+            <End Role="Formulas" EntitySet="Formulas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Insumos_FamiliaInsumos" Association="Self.FK_Insumos_FamiliaInsumos">
+            <End Role="FamiliaInsumos" EntitySet="FamiliaInsumos" />
+            <End Role="Insumos" EntitySet="Insumos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProductosTerminados_Formulas" Association="Self.FK_ProductosTerminados_Formulas">
+            <End Role="Formulas" EntitySet="Formulas" />
+            <End Role="ProductosTerminados" EntitySet="ProductosTerminados" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="sdproliza_devModelStoreContainer" CdmEntityContainer="sdprolizaEntities">
+          <EntitySetMapping Name="DetallesFormulas">
+            <EntityTypeMapping TypeName="sdproliza_devModel.DetallesFormulas">
+              <MappingFragment StoreEntitySet="DetallesFormulas">
+                <ScalarProperty Name="IdDetalle" ColumnName="IdDetalle" />
+                <ScalarProperty Name="IdFormula" ColumnName="IdFormula" />
+                <ScalarProperty Name="IdInsumo" ColumnName="IdInsumo" />
+                <ScalarProperty Name="CantidadInsumo" ColumnName="CantidadInsumo" />
+                <ScalarProperty Name="UnidadMedidaInsumo" ColumnName="UnidadMedidaInsumo" />
+                <ScalarProperty Name="CostoInsumo" ColumnName="CostoInsumo" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="IdUsuarioCreo" ColumnName="IdUsuarioCreo" />
+                <ScalarProperty Name="FechaCreo" ColumnName="FechaCreo" />
+                <ScalarProperty Name="IdUsuarioModifica" ColumnName="IdUsuarioModifica" />
+                <ScalarProperty Name="FechaModifica" ColumnName="FechaModifica" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DetallesProductos">
+            <EntityTypeMapping TypeName="sdproliza_devModel.DetallesProductos">
+              <MappingFragment StoreEntitySet="DetallesProductos">
+                <ScalarProperty Name="IdDetalle" ColumnName="IdDetalle" />
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="IdInsumo" ColumnName="IdInsumo" />
+                <ScalarProperty Name="CostoInsumo" ColumnName="CostoInsumo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FamiliaFormulas">
+            <EntityTypeMapping TypeName="sdproliza_devModel.FamiliaFormulas">
+              <MappingFragment StoreEntitySet="FamiliaFormulas">
+                <ScalarProperty Name="IdFamilia" ColumnName="IdFamilia" />
+                <ScalarProperty Name="NombreFamilia" ColumnName="NombreFamilia" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FamiliaInsumos">
+            <EntityTypeMapping TypeName="sdproliza_devModel.FamiliaInsumos">
+              <MappingFragment StoreEntitySet="FamiliaInsumos">
+                <ScalarProperty Name="IdFamilia" ColumnName="IdFamilia" />
+                <ScalarProperty Name="NombreFamilia" ColumnName="NombreFamilia" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Formulas">
+            <EntityTypeMapping TypeName="sdproliza_devModel.Formulas">
+              <MappingFragment StoreEntitySet="Formulas">
+                <ScalarProperty Name="IdFormula" ColumnName="IdFormula" />
+                <ScalarProperty Name="NombreFormula" ColumnName="NombreFormula" />
+                <ScalarProperty Name="FechaElaboracion" ColumnName="FechaElaboracion" />
+                <ScalarProperty Name="Cantidad" ColumnName="Cantidad" />
+                <ScalarProperty Name="Capacidad" ColumnName="Capacidad" />
+                <ScalarProperty Name="UnidadMedida" ColumnName="UnidadMedida" />
+                <ScalarProperty Name="CostoTotal" ColumnName="CostoTotal" />
+                <ScalarProperty Name="IdFamilia" ColumnName="IdFamilia" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Insumos">
+            <EntityTypeMapping TypeName="sdproliza_devModel.Insumos">
+              <MappingFragment StoreEntitySet="Insumos">
+                <ScalarProperty Name="IdInsumo" ColumnName="IdInsumo" />
+                <ScalarProperty Name="IdProveedor" ColumnName="IdProveedor" />
+                <ScalarProperty Name="NombreInsumo" ColumnName="NombreInsumo" />
+                <ScalarProperty Name="NombreInterno" ColumnName="NombreInterno" />
+                <ScalarProperty Name="UnidadMedida" ColumnName="UnidadMedida" />
+                <ScalarProperty Name="PrecioUnitario" ColumnName="PrecioUnitario" />
+                <ScalarProperty Name="TotalCompraMX" ColumnName="TotalCompraMX" />
+                <ScalarProperty Name="FechaCompra" ColumnName="FechaCompra" />
+                <ScalarProperty Name="IdFamilia" ColumnName="IdFamilia" />
+                <ScalarProperty Name="IdMoneda" ColumnName="IdMoneda" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductosTerminados">
+            <EntityTypeMapping TypeName="sdproliza_devModel.ProductosTerminados">
+              <MappingFragment StoreEntitySet="ProductosTerminados">
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="IdFormula" ColumnName="IdFormula" />
+                <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+                <ScalarProperty Name="Cantidad" ColumnName="Cantidad" />
+                <ScalarProperty Name="UnidadMedida" ColumnName="UnidadMedida" />
+                <ScalarProperty Name="CostoUnitario" ColumnName="CostoUnitario" />
+                <ScalarProperty Name="CostoTotalProducto" ColumnName="CostoTotalProducto" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="IdUsuarioCreo" ColumnName="IdUsuarioCreo" />
+                <ScalarProperty Name="FechaCreo" ColumnName="FechaCreo" />
+                <ScalarProperty Name="IdUsuarioModifica" ColumnName="IdUsuarioModifica" />
+                <ScalarProperty Name="FechaModifica" ColumnName="FechaModifica" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
