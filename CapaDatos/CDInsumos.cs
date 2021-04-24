@@ -78,20 +78,26 @@ namespace CapaDatos
         public int ActualizarV2(InsumosModel Objeto)
         {
             int res;
+            DataTable tabla = new DataTable();
+
             try
             {
                 using (SqlConnection con = new SqlConnection(AConexion.con))
                 {
                     using (SqlCommand cmd = new SqlCommand("spActualizaInsumosFormulas", con))
                     {
+                        cmd.CommandTimeout = (300);
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.Add("@IdInsumo", SqlDbType.Int).Value = Objeto.IdInsumo;
                         cmd.Parameters.Add("@PUnitario", SqlDbType.Decimal).Value = Objeto.PrecioUnitario;
                         cmd.Parameters.Add("@IdUsuario", SqlDbType.Int).Value = Objeto.IdUsuario;
                         cmd.Parameters.Add("@ActualizaFormulas", SqlDbType.Bit).Value = Objeto.ActualizaFormulas;
-                         con.Open();
-                        res = Convert.ToInt32(cmd.ExecuteScalar());
-                        con.Close();
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            con.Open();
+                            adapter.Fill(tabla);
+                            con.Close();
+                        }
                     }
                 }
             }
@@ -100,7 +106,7 @@ namespace CapaDatos
                 throw new Exception("Error: " + ex.Message);
             }
 
-            return res;
+            return Convert.ToInt32(tabla.Rows[0][0]);
         }
 
         public DataTable ConsultaGridPorProveedor(int IdProveedor)

@@ -226,144 +226,148 @@ namespace CapaNegocios
 
                 //using (TransactionScope scope = new TransactionScope())
                 //{
-                using (sdprolizaEntities contexto = new sdprolizaEntities())
-                {
-                    var insumo = contexto.Insumos.Find(Parametro.IdInsumo);
-                    if (insumo is null)
-                        throw new Exception("Insumo no encontrado.");
-                    insumo.PrecioUnitario = Convert.ToDecimal(Parametro.PrecioUnitario);
-                    insumo.NombreInsumo = Parametro.NombreInsumo;
-                    insumo.NombreInterno = Parametro.NombreInterno;
-                    insumo.UnidadMedida = Parametro.UnidadMedida;
-                    insumo.IdMoneda = Parametro.IdMoneda;
-                    insumo.IdFamilia = Parametro.IdFamilia;
-                    insumo.IdProveedor = Parametro.IdProveedor;
+                //using (sdprolizaEntities contexto = new sdprolizaEntities())
+                //{
+                //    var insumo = contexto.Insumos.Find(Parametro.IdInsumo);
+                //    if (insumo is null)
+                //        throw new Exception("Insumo no encontrado.");
+                //    insumo.PrecioUnitario = Convert.ToDecimal(Parametro.PrecioUnitario);
+                //    insumo.NombreInsumo = Parametro.NombreInsumo;
+                //    insumo.NombreInterno = Parametro.NombreInterno;
+                //    insumo.UnidadMedida = Parametro.UnidadMedida;
+                //    insumo.IdMoneda = Parametro.IdMoneda;
+                //    insumo.IdFamilia = Parametro.IdFamilia;
+                //    insumo.IdProveedor = Parametro.IdProveedor;
 
-                    if (Parametro.ActualizaFormulas)
-                    {
+                //    if (Parametro.ActualizaFormulas)
+                //    {
 
-                        List<int> FormulasInsumo = contexto.DetallesFormulas.Where(x => x.IdInsumo == Parametro.IdInsumo && x.Formulas.Activo).Select(y => y.IdFormula).ToList();
-                        List<Formulas> lstFormulas = contexto.Formulas.Where(x => FormulasInsumo.Contains(x.IdFormula)).ToList();
-                        List<Formulas> lstNewFormulas = new List<Formulas>();
+                //        List<int> FormulasInsumo = contexto.DetallesFormulas.Where(x => x.IdInsumo == Parametro.IdInsumo && x.Formulas.Activo).Select(y => y.IdFormula).ToList();
+                //        List<Formulas> lstFormulas = contexto.Formulas.Where(x => FormulasInsumo.Contains(x.IdFormula)).ToList();
+                //        List<Formulas> lstNewFormulas = new List<Formulas>();
 
-                        List<int> ProductosInsumo = contexto.DetallesProductos.Where(x => x.IdInsumo == Parametro.IdInsumo && x.ProductosTerminados.Activo).Select(y => y.IdProducto).ToList();
-                        List<ProductosTerminados> lstProductos = contexto.ProductosTerminados.Where(x => ProductosInsumo.Contains(x.IdProducto)).ToList();
-                        List<ProductosTerminados> lstNewProductos = new List<ProductosTerminados>();
+                //        List<int> ProductosInsumo = contexto.DetallesProductos.Where(x => x.IdInsumo == Parametro.IdInsumo && x.ProductosTerminados.Activo).Select(y => y.IdProducto).ToList();
+                //        List<ProductosTerminados> lstProductos = contexto.ProductosTerminados.Where(x => ProductosInsumo.Contains(x.IdProducto)).ToList();
+                //        List<ProductosTerminados> lstNewProductos = new List<ProductosTerminados>();
 
-                        lstFormulas.ForEach(x =>
-                        {
-                            var detalles = contexto.DetallesFormulas.Where(y => y.IdFormula == x.IdFormula).ToList();
-                            var newDetalles = new List<DetallesFormulas>();
-                            var productos = contexto.ProductosTerminados.Where(p => p.Activo && p.IdFormula == x.IdFormula).ToList();
-                            var newProductos = new List<ProductosTerminados>();
-                            detalles.ForEach(y =>
-                            {
-                                newDetalles.Add(new DetallesFormulas
-                                {
-                                    Activo = true,
-                                    CantidadInsumo = y.CantidadInsumo,
-                                    FechaCreo = DateTime.Now,
-                                    IdInsumo = y.IdInsumo,
-                                    IdUsuarioCreo = Parametro.IdUsuario,
-                                    CostoInsumo = y.IdInsumo != Parametro.IdInsumo ? y.CostoInsumo :
-                                    (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (y.CantidadInsumo * FactorMedida(y.Insumos.UnidadMedida, y.UnidadMedidaInsumo)),
-                                    UnidadMedidaInsumo = y.UnidadMedidaInsumo
-                                });
-                            });
-                            var newFormula = new Formulas
-                            {
-                                Activo = true,
-                                Cantidad = x.Cantidad,
-                                Capacidad = x.Capacidad,
-                                CostoTotal = newDetalles.Select(y => y.CostoInsumo).Sum(),
-                                DetallesFormulas = newDetalles,
-                                NombreFormula = x.NombreFormula,
-                                UnidadMedida = x.UnidadMedida,
-                                IdFamilia = x.IdFamilia,
-                                FechaElaboracion = DateTime.Now,
-                            };
-                            decimal CostoMinimoFormula = newFormula.UnidadMedida.Equals("K") ?
-                            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
-                                                                            newFormula.Capacidad.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
-                                                                            Convert.ToDecimal(newFormula.Cantidad))) :
-                            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(newFormula.Cantidad)) :
-                                                                            Convert.ToDecimal(newFormula.Cantidad)));
+                //        lstFormulas.ForEach(x =>
+                //        {
+                //            var detalles = contexto.DetallesFormulas.Where(y => y.IdFormula == x.IdFormula).ToList();
+                //            var newDetalles = new List<DetallesFormulas>();
+                //            var productos = contexto.ProductosTerminados.Where(p => p.Activo && p.IdFormula == x.IdFormula).ToList();
+                //            var newProductos = new List<ProductosTerminados>();
+                //            detalles.ForEach(y =>
+                //            {
+                //                newDetalles.Add(new DetallesFormulas
+                //                {
+                //                    Activo = true,
+                //                    CantidadInsumo = y.CantidadInsumo,
+                //                    FechaCreo = DateTime.Now,
+                //                    IdInsumo = y.IdInsumo,
+                //                    IdUsuarioCreo = Parametro.IdUsuario,
+                //                    CostoInsumo = y.IdInsumo != Parametro.IdInsumo ? y.CostoInsumo :
+                //                    (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (y.CantidadInsumo * FactorMedida(y.Insumos.UnidadMedida, y.UnidadMedidaInsumo)),
+                //                    UnidadMedidaInsumo = y.UnidadMedidaInsumo
+                //                });
+                //            });
+                //            var newFormula = new Formulas
+                //            {
+                //                Activo = true,
+                //                Cantidad = x.Cantidad,
+                //                Capacidad = x.Capacidad,
+                //                CostoTotal = newDetalles.Select(y => y.CostoInsumo).Sum(),
+                //                DetallesFormulas = newDetalles,
+                //                NombreFormula = x.NombreFormula,
+                //                UnidadMedida = x.UnidadMedida,
+                //                IdFamilia = x.IdFamilia,
+                //                FechaElaboracion = DateTime.Now,
+                //            };
+                //            decimal CostoMinimoFormula = newFormula.UnidadMedida.Equals("K") ?
+                //            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
+                //                                                            newFormula.Capacidad.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
+                //                                                            Convert.ToDecimal(newFormula.Cantidad))) :
+                //            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(newFormula.Cantidad)) :
+                //                                                            Convert.ToDecimal(newFormula.Cantidad)));
 
-                            productos.ForEach(prod =>
-                            {
-                                decimal CostoGranel = CostoMinimoFormula *
-                                                  (prod.UnidadMedida.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(prod.Cantidad)) :
-                                                prod.UnidadMedida.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
-                                                 prod.UnidadMedida.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
-                                                  Convert.ToDecimal(prod.Cantidad));
-                                var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
-                                prod.DetallesProductos = new List<DetallesProductos>();
-                                detProd.ForEach(dp =>
-                                {
-                                    prod.DetallesProductos.Add(new DetallesProductos
-                                    {
-                                        CostoInsumo = dp.CostoInsumo,
-                                        IdInsumo = dp.IdInsumo,
+                //            productos.ForEach(prod =>
+                //            {
+                //                decimal CostoGranel = CostoMinimoFormula *
+                //                                  (prod.UnidadMedida.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(prod.Cantidad)) :
+                //                                prod.UnidadMedida.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
+                //                                 prod.UnidadMedida.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
+                //                                  Convert.ToDecimal(prod.Cantidad));
+                //                var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
+                //                prod.DetallesProductos = new List<DetallesProductos>();
+                //                detProd.ForEach(dp =>
+                //                {
+                //                    prod.DetallesProductos.Add(new DetallesProductos
+                //                    {
+                //                        CostoInsumo = dp.CostoInsumo,
+                //                        IdInsumo = dp.IdInsumo,
 
-                                    });
-                                });
-                                newProductos.Add(new ProductosTerminados
-                                {
-                                    Activo = true,
-                                    Cantidad = prod.Cantidad,
-                                    FechaCreo = DateTime.Now,
-                                    IdUsuarioCreo = Parametro.IdUsuario,
-                                    NombreProducto = prod.NombreProducto,
-                                    UnidadMedida = prod.UnidadMedida,
-                                    CostoUnitario = CostoGranel,
-                                    CostoTotalProducto = prod.DetallesProductos.Sum(dp => dp.CostoInsumo) + CostoGranel,
-                                });
-                            });
-                            newFormula.ProductosTerminados = newProductos;
-                            lstNewFormulas.Add(newFormula);
+                //                    });
+                //                });
+                //                newProductos.Add(new ProductosTerminados
+                //                {
+                //                    Activo = true,
+                //                    Cantidad = prod.Cantidad,
+                //                    FechaCreo = DateTime.Now,
+                //                    IdUsuarioCreo = Parametro.IdUsuario,
+                //                    NombreProducto = prod.NombreProducto,
+                //                    UnidadMedida = prod.UnidadMedida,
+                //                    CostoUnitario = CostoGranel,
+                //                    CostoTotalProducto = prod.DetallesProductos.Sum(dp => dp.CostoInsumo) + CostoGranel,
+                //                });
+                //            });
+                //            newFormula.ProductosTerminados = newProductos;
+                //            lstNewFormulas.Add(newFormula);
 
-                            x.Activo = false;
-                        });
-                        lstProductos.ForEach(prod =>
-                        {
-                            var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
-                            prod.DetallesProductos = new List<DetallesProductos>();
-                            detProd.ForEach(dp =>
-                            {
-                                prod.DetallesProductos.Add(new DetallesProductos
-                                {
-                                    CostoInsumo = dp.CostoInsumo,
-                                    IdInsumo = dp.IdInsumo,
+                //            x.Activo = false;
+                //        });
+                //        lstProductos.ForEach(prod =>
+                //        {
+                //            var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
+                //            var detalles = new List<DetallesProductos>();
+                //            detProd.ForEach(dp =>
+                //            {
+                //                detalles.Add(new DetallesProductos
+                //                {
+                //                    CostoInsumo = dp.CostoInsumo,
+                //                    IdInsumo = dp.IdInsumo,
 
-                                });
-                            });
-                            lstNewProductos.Add(new ProductosTerminados
-                            {
-                                Activo = true,
-                                Cantidad = prod.Cantidad,
-                                FechaCreo = DateTime.Now,
-                                IdUsuarioCreo = Parametro.IdUsuario,
-                                NombreProducto = prod.NombreProducto,
-                                UnidadMedida = prod.UnidadMedida,
-                                CostoUnitario = prod.CostoUnitario,
-                                CostoTotalProducto = prod.DetallesProductos.Sum(dp => dp.CostoInsumo) + prod.CostoUnitario,
-                            });
-                            prod.Activo = false;
-                            prod.FechaModifica = DateTime.Now;
-                            prod.IdUsuarioModifica = Parametro.IdUsuario;
-                        });
-                        contexto.Formulas.AddRange(lstNewFormulas);
-                        contexto.ProductosTerminados.AddRange(lstNewProductos);
-                    }
+                //                });
+                //            });
+                //            lstNewProductos.Add(new ProductosTerminados
+                //            {
+                //                Activo = true,
+                //                Cantidad = prod.Cantidad,
+                //                FechaCreo = DateTime.Now,
+                //                IdUsuarioCreo = Parametro.IdUsuario,
+                //                NombreProducto = prod.NombreProducto,
+                //                UnidadMedida = prod.UnidadMedida,
+                //                CostoUnitario = prod.CostoUnitario,
+                //                CostoTotalProducto = detalles.Sum(dp => dp.CostoInsumo) + prod.CostoUnitario,
+                //                IdFormula = prod.IdFormula,
+                //                DetallesProductos = detalles
 
-                    contexto.SaveChanges();
+                //            });
+                //            prod.Activo = false;
+                //            prod.FechaModifica = DateTime.Now;
+                //            prod.IdUsuarioModifica = Parametro.IdUsuario;
+                //        });
+                //        contexto.Formulas.AddRange(lstNewFormulas);
+                //        contexto.ProductosTerminados.AddRange(lstNewProductos);
+                //    }
 
-                }
+                //    contexto.SaveChanges();
+
+                //}
                 #region
                 //if (new CDInsumos().Actualizar(Parametro) < 1)
                 //    throw new Exception("No se han podido actualizar los datos del insumo.");
                 //if (new CDInsumos().ActualizarV2(Parametro) < 1)
-                //    throw new Exception("No se han podido actualizar los datos del insumo.");
+                if (new CDInsumos().ActualizarV2(Parametro) < 1)
+                    throw new Exception("No se han podido actualizar los datos del insumo.");
                 //if (ActualizarPrecios)
                 //{
                 //    int IdFormula = 0;
