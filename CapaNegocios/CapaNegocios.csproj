@@ -71,7 +71,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BackupGenerator.cs" />
     <Compile Include="Reporteador.cs" />
-    <Compile Include="resp.cs" />
     <Compile Include="UpdatePrices.cs" />
   </ItemGroup>
   <ItemGroup>

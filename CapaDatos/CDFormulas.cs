@@ -7,13 +7,19 @@ namespace CapaDatos
 {
     public class CDFormulas
     {
+        private string conexion { get; set; }
+
+        public CDFormulas(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
 
         public int Guardar(FormulasModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasGuardar", con))
                     {
@@ -43,7 +49,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasGuardar", con))
                     {
@@ -74,7 +80,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasDardeBaja", con))
                     {
@@ -99,7 +105,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasConsultaPorNombre", con))
                     {
@@ -130,7 +136,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasConsultaActivo", con))
                     {
@@ -157,7 +163,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasConsultaPorId", con))
                     {
@@ -187,7 +193,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFormulasConsultaPorFamilia", con))
                     {

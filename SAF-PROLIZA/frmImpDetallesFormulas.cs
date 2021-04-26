@@ -1,5 +1,6 @@
 ﻿using CapaNegocios;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Windows.Forms;
 
@@ -51,7 +52,9 @@ namespace SAF_PROLIZA
             foreach (DataRow item in Formula.Rows)
             {
                 Productos.Rows.Clear();
-                Productos = new CNProductos().ConsultaPorFormula(Convert.ToInt32(item["IdFormula"]));
+                string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+
+                Productos = new CNProductos(connectionString).ConsultaPorFormula(Convert.ToInt32(item["IdFormula"]));
                 if (Productos.Rows.Count == 0)
                 {
                     msj += "\n" + item["NombreFormula"].ToString();

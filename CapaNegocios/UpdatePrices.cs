@@ -7,11 +7,21 @@ namespace CapaNegocios
 {
     public class UpdatePrices
     {
-        CNDetallesFormulas Detalle = new CNDetallesFormulas();
-        CNDetallesProductos DEtalleP = new CNDetallesProductos();
-        //CNInsumos Insumo = new CNInsumos();
-        CNProductos Producto = new CNProductos();
-        CNFormulas Formula = new CNFormulas();
+
+        private readonly CNInsumos cnInsumos;
+        private readonly CNFormulas cnFormulas;
+        private readonly CNDetallesFormulas cnDetFormula;
+        private readonly CNDetallesProductos cnDetProducto;
+        private readonly CNProductos cnProductos;
+        public UpdatePrices(string conexion)
+        {
+            cnInsumos = new CNInsumos(conexion, -1, null, false, 0);
+            cnFormulas = new CNFormulas(conexion);
+            cnDetFormula = new CNDetallesFormulas(conexion);
+            cnDetProducto = new CNDetallesProductos(conexion);
+            cnProductos = new CNProductos(conexion);
+        }
+
         List<int> listaFormulas = new List<int>();
         List<int> listaProductos = new List<int>();
         int IdInsumo;
@@ -22,7 +32,7 @@ namespace CapaNegocios
         double CalculaPrecioUnitarioProducto(int IdFormula, int IdProducto)
         {
             #region "Calcula PrecioUnitario Formula"
-            DataRow PrecioFormula = Formula.ConsultaPorId(IdFormula).Rows[0];
+            DataRow PrecioFormula = cnFormulas.ConsultaPorId(IdFormula).Rows[0];
             double CostoTotal = Convert.ToDouble(PrecioFormula["CostoTotal"]);
             string UnidadMedidaFormula = Convert.ToString(PrecioFormula["Capacidad"]);
             int Cantidad = Convert.ToInt32(PrecioFormula["Cantidad"]);
@@ -46,7 +56,7 @@ namespace CapaNegocios
                     break;
             }
             #endregion
-            DataRow listaProducto = Producto.ConsultaConsultaPorId(IdProducto).Rows[0];
+            DataRow listaProducto = cnProductos.ConsultaConsultaPorId(IdProducto).Rows[0];
             PrecioDetalles = Convert.ToDouble(listaProducto["CostoTotalProducto"]) - Convert.ToDouble(listaProducto["CostoUnitario"]);
             string UnidadMedida = Convert.ToString(listaProducto["UnidadMedida"]);
             double CantidadProducto = Convert.ToInt32(listaProducto["Cantidad"]);
@@ -74,7 +84,7 @@ namespace CapaNegocios
         double CalculaPrecioUnitarioFormula(int IdFormula)
         {
             #region "Calcula PrecioUnitario Formula"
-            DataRow PrecioFormula = Formula.ConsultaPorId(IdFormula).Rows[0];
+            DataRow PrecioFormula = cnFormulas.ConsultaPorId(IdFormula).Rows[0];
             double CostoTotal = Convert.ToDouble(PrecioFormula["CostoTotal"]);
             string UnidadMedidaFormula = Convert.ToString(PrecioFormula["Capacidad"]);
             int Cantidad = Convert.ToInt32(PrecioFormula["Cantidad"]);
@@ -176,19 +186,17 @@ namespace CapaNegocios
             int IdFormula = 0;
             for (int i = 0; i < listaFormulas.Count; i++)
             {
-                CNFormulas Formulas = new CNFormulas();
-                DataTable BusquedaFormulas = Formulas.ConsultaPorId(listaFormulas[i]);
-                DataTable DetalleFormula = Detalle.ConsultaPorFormula(listaFormulas[i]);
+                DataTable DetalleFormula = cnDetFormula.ConsultaPorFormula(listaFormulas[i]);
 
                 IdFormula = 0;//Convert.ToInt32(Formulas.Guardar(AsignaRowObjetoFormula(BusquedaFormulas.Rows[0])));
-                Formula.Borrar(listaFormulas[i]);
+                cnFormulas.Borrar(listaFormulas[i]);
                 foreach (DataRow row in DetalleFormula.Rows)
                 {
-                    Detalle.Borrar(Convert.ToInt32(row["IdDetalle"]));
+                    cnDetFormula.Borrar(Convert.ToInt32(row["IdDetalle"]));
                     row["IdFormula"] = IdFormula;
                     if (IdInsumo == Convert.ToInt32(row["IdInsumo"]))
                         row["CostoInsumo"] = CalculaPrecioDetalleFormula(Convert.ToString(row["UnidadMedidaInsumo"]), Convert.ToDouble(row["CantidadInsumo"]), Convert.ToInt32(row["IdMoneda"]));
-                    Detalle.Guardar(AsignaRowObjetoDetalleFormula(row));
+                    cnDetFormula.Guardar(AsignaRowObjetoDetalleFormula(row));
                 }
             }
             return IdFormula;
@@ -197,11 +205,11 @@ namespace CapaNegocios
         {
             for (int i = 0; i < lista.Count; i++)
             {
-                DataTable listaProductos = Producto.ConsultaPorFormula(lista[i]);
+                DataTable listaProductos = cnProductos.ConsultaPorFormula(lista[i]);
                 for (int j = 0; j < listaProductos.Rows.Count; j++)
                 {
-                    DataTable DetallesProductos = DEtalleP.ConsultaDetallesPorProducto(Convert.ToInt32(listaProductos.Rows[j]["IdProducto"]));
-                    Producto.Borrar(Convert.ToInt32(listaProductos.Rows[j]["IdProducto"]));
+                    DataTable DetallesProductos = cnDetProducto.ConsultaDetallesPorProducto(Convert.ToInt32(listaProductos.Rows[j]["IdProducto"]));
+                    cnProductos.Borrar(Convert.ToInt32(listaProductos.Rows[j]["IdProducto"]));
 
                     ProductosModel _Productos = new ProductosModel
                     {
@@ -215,11 +223,11 @@ namespace CapaNegocios
                     };
                     _Productos.CostoTotalProducto = _Productos.CostoUnitario + Convert.ToDecimal(PrecioDetalles);
 
-                    int id = Convert.ToInt32(Producto.Guardar(_Productos));
+                    int id = Convert.ToInt32(cnProductos.Guardar(_Productos));
                     foreach (DataRow row in DetallesProductos.Rows)
                     {
 
-                        DEtalleP.Guardar(new DetallesProductosModel
+                        cnDetProducto.Guardar(new DetallesProductosModel
                         {
                             IdDetalle = 0,
                             IdProducto = id,
@@ -236,7 +244,7 @@ namespace CapaNegocios
         {
             for (int i = 0; i < lista.Count; i++)
             {
-                DataTable listaProductos = Producto.ConsultaConsultaPorId(lista[i]);
+                DataTable listaProductos = cnProductos.ConsultaConsultaPorId(lista[i]);
                 ProductosModel _Productos = new ProductosModel
                 {
                     IdProducto = Convert.ToInt32(listaProductos.Rows[0]["IdProducto"]),
@@ -248,8 +256,8 @@ namespace CapaNegocios
                     CostoTotalProducto = Convert.ToDecimal(listaProductos.Rows[0]["CostoUnitario"]),
                     Activo = (bool)(listaProductos.Rows[0]["Activo"])
                 };
-                int IdP = Convert.ToInt32(Producto.Guardar(_Productos));
-                DataTable Detalles = DEtalleP.ConsultaDetallesPorProducto(Convert.ToInt32(listaProductos.Rows[0]["IdProducto"]));
+                int IdP = Convert.ToInt32(cnProductos.Guardar(_Productos));
+                DataTable Detalles = cnDetProducto.ConsultaDetallesPorProducto(Convert.ToInt32(listaProductos.Rows[0]["IdProducto"]));
                 double Precio = 0.00;
                 foreach (DataRow row in Detalles.Rows)
                 {
@@ -265,7 +273,7 @@ namespace CapaNegocios
                         Precio += Convert.ToDouble(row["Precio"]);
                     }
 
-                    DEtalleP.Guardar(new DetallesProductosModel
+                    cnDetProducto.Guardar(new DetallesProductosModel
                     {
                         CostoInsumo = Convert.ToDecimal(row["Precio"]),
                         IdDetalle = Convert.ToInt32(row["IdDetalle"]),
@@ -275,8 +283,8 @@ namespace CapaNegocios
                 }
                 _Productos.IdProducto = IdP;
                 _Productos.CostoTotalProducto += Convert.ToDecimal(Precio);
-                Producto.Actualizar(_Productos);
-                Producto.Borrar(lista[i]);
+                cnProductos.Actualizar(_Productos);
+                cnProductos.Borrar(lista[i]);
             }
         }
 
@@ -286,10 +294,10 @@ namespace CapaNegocios
             this.dolar = dolar;
             this.IdInsumo = IdInsumo;
             this.PrecioInsumo = PrecioInsumo;
-            DataTable BusquedaInsumo = new CNInsumos().ConsultaPorId(IdInsumo);
+            DataTable BusquedaInsumo = cnInsumos.ConsultaPorId(IdInsumo);
 
             //ActualizaPrecioInsumo(BusquedaInsumo, PrecioInsumo);
-            DataTable BusquedaFormulas = Detalle.ConsultaPorInsumo(IdInsumo);
+            DataTable BusquedaFormulas = cnDetFormula.ConsultaPorInsumo(IdInsumo);
             if (BusquedaFormulas.Rows.Count != 0)
             {//SI ENTRA, ES PORQUE EL INSUMO ES UN REACTIVO
                 foreach (DataRow row in BusquedaFormulas.Rows)
@@ -299,8 +307,8 @@ namespace CapaNegocios
                 }
                 int Id = CrearFormulaNueva(listaFormulas);
                 CrearNuevoPrducto(listaFormulas, Id);
-                DataRow Formulanueva = Formula.ConsultaPorId(Id).Rows[0];
-                BusquedaInsumo = new CNInsumos().ConsultaPorNombre(Formulanueva["NombreFormula"].ToString());
+                DataRow Formulanueva = cnFormulas.ConsultaPorId(Id).Rows[0];
+                BusquedaInsumo = cnInsumos.ConsultaPorNombre(Formulanueva["NombreFormula"].ToString());
                 if (BusquedaInsumo.Rows.Count != 0)
                 {
                     for (int i = 0; i < BusquedaInsumo.Rows.Count; i++)
@@ -311,7 +319,7 @@ namespace CapaNegocios
             }
             else
             {//SE VA POR ESTE LADO SI Y SOLO SI EL INSUMO ES DE EMPAQUETADO
-                DataTable Productos = DEtalleP.ConsultaDetallesPorInsumo(IdInsumo);
+                DataTable Productos = cnDetProducto.ConsultaDetallesPorInsumo(IdInsumo);
                 if (Productos.Rows.Count != 0)
                 {
                     foreach (DataRow row in Productos.Rows)

@@ -7,12 +7,19 @@ namespace CapaDatos
 {
     public class CDProductos
     {
+        private string conexion { get; set; }
+
+        public CDProductos(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
         public int Guardar(ProductosModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosGuardar", con))
                     {
@@ -45,7 +52,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosGuardar", con))
                     {
@@ -80,7 +87,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaPorNombre", con))
                     {
@@ -110,7 +117,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaPorId", con))
                     {
@@ -140,7 +147,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaPorFormula", con))
                     {
@@ -170,7 +177,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaActivos", con))
                     {
@@ -197,7 +204,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaCatalogo", con))
                     {
@@ -223,7 +230,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosConsultaVariedades", con))
                     {
@@ -253,7 +260,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDarDeBajaProductosPorFormula", con))
                     {
@@ -277,7 +284,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProductosTerminadosDarDeBaja", con))
                     {

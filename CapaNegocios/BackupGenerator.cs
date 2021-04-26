@@ -5,14 +5,18 @@ namespace CapaNegocios
 {
     public class BackupGenerator
     {
-
+        private static CNUsuarios cnUsuario;
+        public BackupGenerator(string conexion)
+        {
+            cnUsuario = new CNUsuarios(conexion);
+        }
         public void SimpleFileMove()
         {
             int Mes = DateTime.Now.Month;
             int anio = DateTime.Now.Year;
-            if (new CNUsuarios().ConsultaRespaldoFecha(Mes, anio).Rows.Count == 0)
+            if (cnUsuario.ConsultaRespaldoFecha(Mes, anio).Rows.Count == 0)
             {
-                new CNUsuarios().Respaldo();
+                cnUsuario.Respaldo();
                 string[] dirs = Directory.GetFiles(@"C:\PROLIZA\", "*.bak");
                 int cantidad = dirs.Length;
                 for (int i = 0; i < dirs.Length; i++)
@@ -28,13 +32,13 @@ namespace CapaNegocios
             var dateTosearch = DateTime.Now.AddMonths(-1);
             int Mes = dateTosearch.Month;
             int anio = dateTosearch.Year;
-            return new CNUsuarios().ConsultaRespaldoFecha(Mes, anio).Rows.Count != 0;
+            return cnUsuario.ConsultaRespaldoFecha(Mes, anio).Rows.Count != 0;
         }
         public static bool createRespaldo(string Directory, out string Msj)
         {
             try
             {
-                if (new CNUsuarios().Respaldo(Directory) == 0)
+                if (cnUsuario.Respaldo(Directory) == 0)
                     throw new Exception("Error al crear el respaldo. Contacte al administrador de sistemas.");
                 Msj = "";
                 return true;

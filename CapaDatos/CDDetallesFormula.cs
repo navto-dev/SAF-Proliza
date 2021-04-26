@@ -8,12 +8,19 @@ namespace CapaDatos
 {
     public class CDDetallesFormula
     {
+        private string conexion { get; set; }
+
+        public CDDetallesFormula(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
         public int Guardar(DetallesFormulasModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasGuardar", con))
                     {
@@ -44,7 +51,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasGuardar", con))
                     {
@@ -55,6 +62,7 @@ namespace CapaDatos
                         cmd.Parameters.Add("@CantidadInsumo", SqlDbType.Decimal).Value = Objeto.CantidadInsumo;
                         cmd.Parameters.Add("@UnidadMedidaInsumo", SqlDbType.NVarChar).Value = Objeto.UnidadMedidaInsumo;
                         cmd.Parameters.Add("@CostoInsumo", SqlDbType.Decimal).Value = Objeto.CostoInsumo;
+                        cmd.Parameters.Add("@IdUsuario", SqlDbType.Int).Value = Objeto.IdUsuario;
                         cmd.Parameters.Add("@DetalleAccion", SqlDbType.NVarChar).Value = "A";
                         con.Open();
                         res = Convert.ToInt32(cmd.ExecuteScalar());
@@ -74,7 +82,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasDaraDeBaja", con))
                     {
@@ -99,7 +107,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spCambiarPreciosFormulas", con))
                     {
@@ -126,7 +134,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasConsultaPorFormula", con))
                     {
@@ -156,7 +164,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasConsultaPorId", con))
                     {
@@ -186,7 +194,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasConsultaPorInsumo", con))
                     {
@@ -216,7 +224,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spDetallesFormulasConsultaPorMoneda", con))
                     {

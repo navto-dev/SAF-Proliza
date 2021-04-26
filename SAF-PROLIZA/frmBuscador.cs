@@ -1,5 +1,6 @@
 ﻿using CapaNegocios;
 using System;
+using System.Configuration;
 using System.Windows.Forms;
 
 namespace SAF_PROLIZA
@@ -7,7 +8,20 @@ namespace SAF_PROLIZA
     public partial class frmBuscador : DevExpress.XtraBars.Ribbon.RibbonForm
     {
         string EstadoFormulario;
+        private readonly CNFormulas cnFormula;
+        private readonly CNProductos cnProducto;
+        private readonly CNInsumos cnInsumos;
 
+        public frmBuscador(string Edo)
+        {
+            InitializeComponent();
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+            cnFormula = new CNFormulas(connectionString);
+            cnProducto = new CNProductos(connectionString);
+            cnInsumos = new CNInsumos(connectionString, -1, null, false, 0);
+            prepararFormulario(Edo);
+            llenarComboInsumos(Edo);
+        }
         void prepararFormulario(string Estado)
         {
             switch (Estado)
@@ -35,7 +49,7 @@ namespace SAF_PROLIZA
             {
                 case "Formulas":
                     cmbBuscador.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("NombreFormula"));
-                    cmbBuscador.Properties.DataSource = new CNFormulas().ConsultaGeneral();
+                    cmbBuscador.Properties.DataSource = cnFormula.ConsultaGeneral();
                     cmbBuscador.Properties.DisplayMember = "NombreFormula";
                     cmbBuscador.Properties.ValueMember = "NombreFormula";
                     break;
@@ -44,13 +58,13 @@ namespace SAF_PROLIZA
                     cmbBuscador.Properties.ValueMember = "NombreInsumo";
                     cmbBuscador.Properties.DisplayMember = "NombreInsumo";
                     //cmbBuscador.Properties.DataSource = Objetos.Insumos.ConsultarInsumo().Tables["Insumos"];
-                    cmbBuscador.Properties.DataSource = new CNInsumos().ConsultaGeneral();
+                    cmbBuscador.Properties.DataSource = cnInsumos.ConsultaGeneral();
                     break;
                 case "Productos":
                     cmbBuscador.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("NombreProducto"));
                     cmbBuscador.Properties.ValueMember = "NombreProducto";
                     cmbBuscador.Properties.DisplayMember = "NombreProducto";
-                    cmbBuscador.Properties.DataSource = new CNProductos().ConsultaActivos();
+                    cmbBuscador.Properties.DataSource = cnProducto.ConsultaActivos();
                     break;
             }
 
@@ -64,7 +78,7 @@ namespace SAF_PROLIZA
             switch (EstadoFormulario)
             {
                 case "Formulas":
-                    if (new CNFormulas().ConsultaPorNombre(cmbBuscador.EditValue.ToString(), true).Rows.Count != 0)
+                    if (cnFormula.ConsultaPorNombre(cmbBuscador.EditValue.ToString(), true).Rows.Count != 0)
                     {
                         Objetos.Nombre = cmbBuscador.EditValue.ToString();
                         Objetos.Activo = false;
@@ -75,7 +89,7 @@ namespace SAF_PROLIZA
                 case "Insumos":
                     // Dts = Objetos.Insumos.ConsultarInsumoPorNombre(cmbBuscador.EditValue.ToString());
                     //if (Dts.Tables["Insumos"].Rows.Count != 0)
-                    if (new CNInsumos().ConsultaPorNombre(cmbBuscador.EditValue.ToString()).Rows.Count != 0)
+                    if (cnInsumos.ConsultaPorNombre(cmbBuscador.EditValue.ToString()).Rows.Count != 0)
                     {
                         Objetos.Nombre = cmbBuscador.EditValue.ToString();
                         DialogResult = DialogResult.OK;
@@ -83,7 +97,7 @@ namespace SAF_PROLIZA
                     }
                     break;
                 case "Productos":
-                    if (new CNProductos().ConsultaPorNombre(cmbBuscador.EditValue.ToString()).Rows.Count != 0)
+                    if (cnProducto.ConsultaPorNombre(cmbBuscador.EditValue.ToString()).Rows.Count != 0)
                     {
                         Objetos.Nombre = cmbBuscador.EditValue.ToString();
                         DialogResult = DialogResult.OK;
@@ -91,12 +105,6 @@ namespace SAF_PROLIZA
                     }
                     break;
             }
-        }
-        public frmBuscador(string Edo)
-        {
-            InitializeComponent();
-            prepararFormulario(Edo);
-            llenarComboInsumos(Edo);
         }
 
         private void btnBuscador_Click(object sender, EventArgs e)

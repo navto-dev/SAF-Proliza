@@ -7,12 +7,19 @@ namespace CapaDatos
 {
     public class CDFamiliaFormulas
     {
+        private string conexion { get; set; }
+
+        public CDFamiliaFormulas(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
         public int Guardar(FamiliaFormulasModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFamiliasFormulasGuardar", con))
                     {
@@ -38,7 +45,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFamiliasFormulasGuardar", con))
                     {
@@ -65,7 +72,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFamiliaFormulasConsultaGeneral", con))
                     {
@@ -93,7 +100,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFamiliaFormulasConsultaIndividual", con))
                     {
@@ -122,7 +129,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spFamiliaFormulasBorrar", con))
                     {

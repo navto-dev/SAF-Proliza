@@ -7,13 +7,18 @@ namespace CapaNegocios
 {
     public class CNMonedas
     {
+        private readonly CDMonedas cdMonedas;
 
+        public CNMonedas(string conexion)
+        {
+            cdMonedas = new CDMonedas(conexion);
+        }
         public int Guardar(MonedasModel Objeto)
         {
             int res;
             try
             {
-                res = new CDMonedas().Guardar(Objeto);
+                res = cdMonedas.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -26,18 +31,18 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDMonedas().Actualizar(Parametro);
+                return cdMonedas.Actualizar(Parametro);
             }
             catch (Exception er)
             {
                 throw new Exception(er.Message);
             }
         }
-        public DataTable ConsultaGeneral( )
+        public DataTable ConsultaGeneral()
         {
             try
             {
-                return new CDMonedas().ConsultaGridGeneral();
+                return cdMonedas.ConsultaGridGeneral();
             }
             catch (Exception er)
             {

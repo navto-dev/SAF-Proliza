@@ -7,13 +7,19 @@ namespace CapaDatos
 {
     public class CDProveedores
     {
+        private string conexion { get; set; }
+
+        public CDProveedores(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
 
         public int Guardar(ProveedoresModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProveedoresGuardar", con))
                     {
@@ -39,7 +45,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProveedoresGuardar", con))
                     {
@@ -66,7 +72,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProveedoresConsutaGeneral", con))
                     {
@@ -94,7 +100,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProveedoresConsultaPorId", con))
                     {
@@ -123,7 +129,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spProveedoresDarDeBaja", con))
                     {

@@ -6,14 +6,20 @@ namespace CapaNegocios
 {
     public class ActualizaFormulas
     {
+        private readonly CNFormulas cnFormulas;
+        private readonly CNProductos cnProductos;
+        public ActualizaFormulas(string conexion)
+        {
+            cnFormulas = new CNFormulas(conexion);
+            cnProductos = new CNProductos(conexion);
+        }
         void MoverProductos(int IdFormula, DataTable TablaProductosOld)
         {
 
             for (int i = 0; i < TablaProductosOld.Rows.Count; i++)
             {
-                CNProductos BLP = new CNProductos();
 
-                BLP.Guardar(new ProductosModel
+                cnProductos.Guardar(new ProductosModel
                 {
                     Activo = (bool)(TablaProductosOld.Rows[i]["Activo"]),
                     Cantidad = Convert.ToDecimal(TablaProductosOld.Rows[i]["Cantidad"].ToString()),
@@ -27,13 +33,11 @@ namespace CapaNegocios
         }
         public int ActualizarFormula(int IdFormula, FormulasModel F)
         {
-            CNFormulas BLF = new CNFormulas();
-            CNProductos BLP = new CNProductos();
-            DataTable TablaProductosOld = BLP.ConsultaPorFormula(IdFormula);
-            BLF.Borrar(IdFormula);
+            DataTable TablaProductosOld = cnProductos.ConsultaPorFormula(IdFormula);
+            cnFormulas.Borrar(IdFormula);
             int id = 0;// Convert.ToInt32(BLF.Guardar(F));
             MoverProductos(id, TablaProductosOld);
-            BLP.BorrarPorFormula(IdFormula);
+            cnProductos.BorrarPorFormula(IdFormula);
             return id;
         }
 

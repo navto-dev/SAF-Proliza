@@ -9,6 +9,7 @@ using System.Deployment.Application;
 using System.Drawing;
 using System.IO;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace SAF_PROLIZA
 {
@@ -18,6 +19,21 @@ namespace SAF_PROLIZA
         public string EstadoGrid = "Productos", nombreProducto = "", ContenidoGrid = "";
         public DataTable T = new DataTable();
         double dolar = 0.00;
+        private readonly CambiaPrecioDolar cambiaPrecioDolar;
+        private readonly CNDetallesProductos cnDetallesProductos;
+        private readonly CNDetallesFormulas cnDetallesFormulas;
+        private readonly CNFamiliaFormulas cnFamiliaFormulas;
+        private readonly CNFamiliaInsumos cnFamiliaInsumos;
+        private readonly CNFormulas cnFormulas;
+        private readonly CNInsumos cnInsumos;
+        private readonly CNProveedores cnProveedores;
+        private readonly CNUsuarios cnUsuarios;
+        private readonly CNTipoDeCambio cnTipoDeCambio;
+
+        public CNProductos cnProductos { get; }
+
+        private readonly Reporteador reporteador;
+
         public void llenarGrid(string EstadoGrid)
         {
             gridView1.FindFilterText = "";
@@ -34,7 +50,7 @@ namespace SAF_PROLIZA
                     gridView1.OptionsBehavior.Editable = false;
                     try
                     {
-                        T = new CNFormulas().ConsultaGeneral();
+                        T = cnFormulas.ConsultaGeneral();
                         gridControl1.DataSource = CalculaCostoUnitario(T);
                         GridColumn myCol1 = new GridColumn() { Caption = "No.Formula", Visible = false, FieldName = "IdFormula" };
                         gridView1.Columns.Add(myCol1);
@@ -61,7 +77,7 @@ namespace SAF_PROLIZA
                             gridView1.Columns["PrecioUnitario"].BestFit();
                         }
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -83,7 +99,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Insumos.ConsultarInsumo().Tables["Insumos"];
-                        T = new CNInsumos().ConsultaGeneral();
+                        T = cnInsumos.ConsultaGeneral();
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No.Insumo", Visible = false, FieldName = "IdInsumo" };
                         gridView1.Columns.Add(myCol1);
@@ -107,7 +123,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol7);
                         gridView1.Columns["NombreMoneda"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -129,7 +145,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Formulas.ConsultarFormulaPorNombre(Objetos.Nombre, Objetos.Activo).Tables["Formulas"];
-                        T = new CNFormulas().ConsultaPorNombre(Objetos.Nombre, Objetos.Activo);
+                        T = cnFormulas.ConsultaPorNombre(Objetos.Nombre, Objetos.Activo);
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No.Formula", Visible = false, FieldName = "IdFormula" };
                         gridView1.Columns.Add(myCol1);
@@ -159,7 +175,7 @@ namespace SAF_PROLIZA
                             }
                         }
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -181,7 +197,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Insumos.ConsultarInsumoPorNombre(Objetos.Nombre).Tables["Insumos"];
-                        T = new CNInsumos().ConsultaPorNombre(Objetos.Nombre);
+                        T = cnInsumos.ConsultaPorNombre(Objetos.Nombre);
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No.Insumo", Visible = false, FieldName = "IdInsumo" };
                         gridView1.Columns.Add(myCol1);
@@ -208,7 +224,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol7);
                         gridView1.Columns["NombreMoneda"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -230,7 +246,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Productos.ConsultarProductos().Tables["ProductosTerminados"];
-                        T = new CNProductos().ConsultaActivos();
+                        T = cnProductos.ConsultaActivos();
                         gridControl1.DataSource = T;
                         GridColumn myCol = new GridColumn() { Caption = "IdProducto", Visible = false, FieldName = "IdProducto" };
                         gridView1.Columns.Add(myCol);
@@ -257,7 +273,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns["NombreFamilia"].BestFit();
 
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -278,7 +294,7 @@ namespace SAF_PROLIZA
                     gridView1.OptionsBehavior.Editable = false;
                     try
                     {
-                        T = new CNProductos().ConsultaPorNombre(Objetos.Nombre);
+                        T = cnProductos.ConsultaPorNombre(Objetos.Nombre);
                         gridControl1.DataSource = T;
                         GridColumn myCol3 = new GridColumn() { Caption = "Nombre del Producto", Visible = true, FieldName = "NombreProducto" };
                         gridView1.Columns.Add(myCol3);
@@ -291,7 +307,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns["NombreFamilia"].BestFit();
 
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -313,7 +329,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Usuario.ConsultaGeneralUsuarios().Tables["Usuario"];
-                        T = new CNUsuarios().ConsultaGeneral();
+                        T = cnUsuarios.ConsultaGeneral();
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No. Usuario", Visible = false, FieldName = "IdUsuario" };
                         gridView1.Columns.Add(myCol1);
@@ -331,7 +347,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol4);
                         gridView1.Columns["email"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -355,7 +371,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Proveedores.ConsultarProveedores().Tables["Proveedores"];
-                        T = new CNProveedores().ConsultaGeneral();
+                        T = cnProveedores.ConsultaGeneral();
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No. Proveedor", Visible = false, FieldName = "IdProveedor" };
                         gridView1.Columns.Add(myCol1);
@@ -364,7 +380,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol2);
                         gridView1.Columns["NombreProveedor"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -388,7 +404,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Proveedores.ConsultarProveedores().Tables["Proveedores"];
-                        T = new CNFamiliaInsumos().ConsultaGeneral();
+                        T = cnFamiliaInsumos.ConsultaGeneral();
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No. Familia", Visible = false, FieldName = "IdFamilia" };
                         gridView1.Columns.Add(myCol1);
@@ -397,7 +413,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol2);
                         gridView1.Columns["NombreFamilia"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -419,7 +435,7 @@ namespace SAF_PROLIZA
                     try
                     {
                         //T = Objetos.Proveedores.ConsultarProveedores().Tables["Proveedores"];
-                        T = new CNFamiliaFormulas().ConsultaGeneral();
+                        T = cnFamiliaFormulas.ConsultaGeneral();
                         gridControl1.DataSource = T;
                         GridColumn myCol1 = new GridColumn() { Caption = "No. Familia", Visible = false, FieldName = "IdFamilia" };
                         gridView1.Columns.Add(myCol1);
@@ -428,7 +444,7 @@ namespace SAF_PROLIZA
                         gridView1.Columns.Add(myCol2);
                         gridView1.Columns["NombreFamilia"].BestFit();
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         //throw new Exception(err.Message, err);
                     }
@@ -445,7 +461,7 @@ namespace SAF_PROLIZA
         void ConsultaPrecioDolar()
         {
             //DataTable Dolar = Objetos.TipoDeCambio.ConsultarReciente().Tables["TipoDeCambio"];
-            DataTable Dolar = new CNTipoDeCambio().ConsultaReciente();
+            DataTable Dolar = cnTipoDeCambio.ConsultaReciente();
             navBarItem4.Caption = "$ " + Dolar.Rows[0]["FactorConversion"].ToString() + " Pesos";
             dolar = Convert.ToDouble(Dolar.Rows[0]["FactorConversion"].ToString());
             Estaticos.dolar = dolar;
@@ -458,7 +474,7 @@ namespace SAF_PROLIZA
                     #region "Formulas"
                     try
                     {
-                        DataTable T = new CNDetallesFormulas().ConsultaPorFormula(IdFormula);
+                        DataTable T = cnDetallesFormulas.ConsultaPorFormula(IdFormula);
                         gridView2.Columns.Clear();
                         gridView2.OptionsView.ColumnAutoWidth = false;
                         gridView2.BestFitColumns();
@@ -512,7 +528,7 @@ namespace SAF_PROLIZA
                     #region "Productos"
                     try
                     {
-                        DataTable T = new CNDetallesProductos().ConsultaDetallesPorProducto(IdFormula);
+                        DataTable T = cnDetallesProductos.ConsultaDetallesPorProducto(IdFormula);
                         gridView2.Columns.Clear();
                         gridView2.OptionsView.ColumnAutoWidth = false;
                         gridView2.BestFitColumns();
@@ -553,7 +569,19 @@ namespace SAF_PROLIZA
         {
             InitializeComponent();
             lblVersion.Caption = Version();
-
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+            cambiaPrecioDolar = new CambiaPrecioDolar(connectionString);
+            cnDetallesProductos = new CNDetallesProductos(connectionString);
+            cnDetallesFormulas = new CNDetallesFormulas(connectionString);
+            cnFamiliaFormulas = new CNFamiliaFormulas(connectionString);
+            cnFamiliaInsumos = new CNFamiliaInsumos(connectionString);
+            cnFormulas = new CNFormulas(connectionString);
+            cnInsumos = new CNInsumos(connectionString, -1, null, false, 0);
+            cnProveedores = new CNProveedores(connectionString);
+            cnProductos = new CNProductos(connectionString);
+            reporteador = new Reporteador(connectionString);
+            cnUsuarios = new CNUsuarios(connectionString);
+            cnTipoDeCambio = new CNTipoDeCambio(connectionString);
         }
 
         DataTable CalculaCostoUnitario(DataTable Formulas)
@@ -925,10 +953,10 @@ namespace SAF_PROLIZA
                             if (ds == DialogResult.Yes)
                             {
                                 //if (Objetos.Insumos.ConsultarInsumoPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Tables["Insumos"].Rows.Count == 0)
-                                if (new CNInsumos().ConsultaPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Rows.Count == 0)
+                                if (cnInsumos.ConsultaPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Rows.Count == 0)
                                 {
                                     //Objetos.Proveedores.BorrarProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString()));
-                                    new CNProveedores().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor")));
+                                    cnProveedores.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor")));
                                     EstadoGrid = "Proveedores";
                                     llenarGrid(EstadoGrid);
                                 }
@@ -956,9 +984,9 @@ namespace SAF_PROLIZA
                         DialogResult ds = MessageBox.Show("¿Deseas dar de baja la familia " + gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "NombreFamilia").ToString() + "?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (ds == DialogResult.Yes)
                         {
-                            if (new CNInsumos().ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
+                            if (cnInsumos.ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
                             {
-                                new CNFamiliaInsumos().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
+                                cnFamiliaInsumos.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
                                 EstadoGrid = "FI";
                                 llenarGrid(EstadoGrid);
                             }
@@ -981,9 +1009,9 @@ namespace SAF_PROLIZA
                         DialogResult ds = MessageBox.Show("¿Deseas dar de baja la familia " + gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "NombreFamilia").ToString() + "?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (ds == DialogResult.Yes)
                         {
-                            if (new CNFormulas().ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
+                            if (cnFormulas.ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
                             {
-                                new CNFamiliaFormulas().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
+                                cnFamiliaFormulas.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
                                 EstadoGrid = "FF";
                                 llenarGrid(EstadoGrid);
                             }
@@ -1030,7 +1058,7 @@ namespace SAF_PROLIZA
             if (frm.CloseBox)
             {
                 ConsultaPrecioDolar();
-                new CambiaPrecioDolar().ActualizarFormulasConDivisaExtranjera(Estaticos.IdUsuario, dolar);
+                cambiaPrecioDolar.ActualizarFormulasConDivisaExtranjera(Estaticos.IdUsuario, dolar);
                 llenarGrid("F");
             }
         }
@@ -1080,14 +1108,14 @@ namespace SAF_PROLIZA
         private void btnImprimir_ItemClick(object sender, ItemClickEventArgs e)
         {
             //frmRptInsumos frm = new frmRptInsumos(Objetos.Insumos.ConsultarInsumo().Tables["Insumos"]);
-            frmRptInsumos frm = new frmRptInsumos(new CNInsumos().ConsultaGeneral());
+            frmRptInsumos frm = new frmRptInsumos(cnInsumos.ConsultaGeneral());
             frm.crystalReportViewer1.PrintReport();
         }
         private void btnImprimirForm_ItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
-                DataTable Ids = new CNFormulas().ConsultaGeneral();
+                DataTable Ids = cnFormulas.ConsultaGeneral();
                 int[] idformula = new int[Ids.Rows.Count];
                 int i = 0;
                 foreach (DataRow item in Ids.Rows)
@@ -1096,7 +1124,7 @@ namespace SAF_PROLIZA
                     i++;
                 }
 
-                frmImpDetallesFormulas frm = new frmImpDetallesFormulas(new Reporteador().PrintAFormula(idformula), "M");
+                frmImpDetallesFormulas frm = new frmImpDetallesFormulas(reporteador.PrintAFormula(idformula), "M");
                 frm.crystalReportViewer1.PrintReport();
             }
             catch
@@ -1105,7 +1133,7 @@ namespace SAF_PROLIZA
         }
         private void btnImprimirProd_ItemClick(object sender, ItemClickEventArgs e)
         {
-            frmRptProductos frm = new frmRptProductos(new CNProductos().ConsultaActivos());
+            frmRptProductos frm = new frmRptProductos(cnProductos.ConsultaActivos());
             frm.crystalReportViewer1.PrintReport();
         }
         private void btnAltaProveedor_ItemClick(object sender, ItemClickEventArgs e)
@@ -1133,10 +1161,10 @@ namespace SAF_PROLIZA
                         if (ds == DialogResult.Yes)
                         {
                             //if (Objetos.Insumos.ConsultarInsumoPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Tables["Insumos"].Rows.Count == 0)
-                            if (new CNInsumos().ConsultaPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Rows.Count == 0)
+                            if (cnInsumos.ConsultaPorProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString())).Rows.Count == 0)
                             {
                                 //Objetos.Proveedores.BorrarProveedor(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor").ToString()));
-                                new CNProveedores().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor")));
+                                cnProveedores.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdProveedor")));
                                 EstadoGrid = "Proveedores";
                                 llenarGrid(EstadoGrid);
                             }
@@ -1172,9 +1200,9 @@ namespace SAF_PROLIZA
                         DialogResult ds = MessageBox.Show("¿Deseas dar de baja la familia " + gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "NombreFamilia").ToString() + "?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (ds == DialogResult.Yes)
                         {
-                            if (new CNInsumos().ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
+                            if (cnInsumos.ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
                             {
-                                new CNFamiliaInsumos().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
+                                cnFamiliaInsumos.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
                                 EstadoGrid = "FI";
                                 llenarGrid(EstadoGrid);
                             }
@@ -1210,9 +1238,9 @@ namespace SAF_PROLIZA
                         DialogResult ds = MessageBox.Show("¿Deseas dar de baja la familia " + gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "NombreFamilia").ToString() + "?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (ds == DialogResult.Yes)
                         {
-                            if (new CNFormulas().ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
+                            if (cnFormulas.ConsultaPorFamilia(int.Parse(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia").ToString())).Rows.Count == 0)
                             {
-                                new CNFamiliaFormulas().Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
+                                cnFamiliaFormulas.Borrar(Convert.ToInt32(gridView1.GetRowCellValue(gridView1.GetSelectedRows()[0], "IdFamilia")));
                                 EstadoGrid = "FF";
                                 llenarGrid(EstadoGrid);
                             }

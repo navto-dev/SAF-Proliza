@@ -7,7 +7,14 @@ namespace CapaNegocios
 {
     public class ActualizadorPrecios
     {
-        CNDetallesFormulas Detalle = new CNDetallesFormulas();
+        private string conexion { get; set; }
+
+        public ActualizadorPrecios(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
+
         DataTable DetailNew = new DataTable();
         int Id = 0;
         List<int> IdsFormula = new List<int>();
@@ -15,7 +22,7 @@ namespace CapaNegocios
         {
             string UnidadMedida = "";
             //DataTable tableInsumos = Insumo.ConsultarInsumoPorId(Id).Tables["Insumos"];
-            DataTable tableInsumos = new CNInsumos().ConsultaPorId(Id);
+            DataTable tableInsumos = new CNInsumos(conexion, -1, null, false, 0).ConsultaPorId(Id);
             UnidadMedida = Convert.ToString(tableInsumos.Rows[0]["UnidadMedida"]);
             return UnidadMedida;
         }
@@ -180,11 +187,11 @@ namespace CapaNegocios
             //    return true;
             //}
             //return false;
-            return new CNInsumos().ConsultaPorNombre(NombreFormula).Rows.Count != 0 ? true : false;
+            return new CNInsumos(conexion, -1, null, false, 0).ConsultaPorNombre(NombreFormula).Rows.Count != 0 ? true : false;
         }
         double CalculaPrecioInsumo(int IdFormula)
         {
-            CNFormulas Formula = new CNFormulas();
+            CNFormulas Formula = new CNFormulas(conexion);
             DataTable TablaFormula = Formula.ConsultaPorId(IdFormula);
             double CostoFormula = Convert.ToDouble(TablaFormula.Rows[0]["CostoTotal"]);
             string unidadMedida = Convert.ToString(TablaFormula.Rows[0]["Capacidad"]);
@@ -197,8 +204,8 @@ namespace CapaNegocios
         //Este Método busca los productos relacionados a la formula que contiene al insumo y les actualiza el precio despues de actualizar el precio de la formula
         void ActuaizarPrecioProductos(int IdFormula, double PrecioUnitarioFormula)
         {
-            CNProductos Productos = new CNProductos();
-            CNFormulas Formulas = new CNFormulas();
+            CNProductos Productos = new CNProductos(conexion);
+            CNFormulas Formulas = new CNFormulas(conexion);
             DataTable _Productos = Productos.ConsultaPorFormula(IdFormula);
             foreach (DataRow row in _Productos.Rows)
             {

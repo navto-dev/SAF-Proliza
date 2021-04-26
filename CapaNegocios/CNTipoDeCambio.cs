@@ -6,12 +6,19 @@ namespace CapaNegocios
 {
     public class CNTipoDeCambio
     {
+        private readonly CDTipoDeCambio cdTipoCambio;
+
+        public CNTipoDeCambio(string conexion)
+        {
+            cdTipoCambio = new CDTipoDeCambio(conexion);
+        }
+
         public int Guardar(TipoDeCambioModel Objeto)
         {
             int res;
             try
             {
-                res = new CDTipoDeCambio().Guardar(Objeto);
+                res = cdTipoCambio.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -24,7 +31,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDTipoDeCambio().Actualizar(Parametro);
+                return cdTipoCambio.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -35,7 +42,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDTipoDeCambio().ConsultaGridPorMoneda(IdMoneda);
+                return cdTipoCambio.ConsultaGridPorMoneda(IdMoneda);
             }
             catch (Exception er)
             {
@@ -46,7 +53,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDTipoDeCambio().ConsultaGridReciente();
+                return cdTipoCambio.ConsultaGridReciente();
             }
             catch (Exception er)
             {

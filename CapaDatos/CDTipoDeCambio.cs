@@ -8,12 +8,19 @@ namespace CapaDatos
 {
     public class CDTipoDeCambio
     {
+        private string conexion { get; set; }
+
+        public CDTipoDeCambio(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
         public int Guardar(TipoDeCambioModel Objeto)
         {
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spTipoDeCambioGuardar", con))
                     {
@@ -40,7 +47,7 @@ namespace CapaDatos
             int res;
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spTipoDeCambioGuardar", con))
                     {
@@ -68,7 +75,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spTipoDeCambioConsultaPorMoneda", con))
                     {
@@ -98,7 +105,7 @@ namespace CapaDatos
 
             try
             {
-                using (SqlConnection con = new SqlConnection(AConexion.con))
+                using (SqlConnection con = new SqlConnection(conexion))
                 {
                     using (SqlCommand cmd = new SqlCommand("spTipoCambioConsultaReciente", con))
                     {

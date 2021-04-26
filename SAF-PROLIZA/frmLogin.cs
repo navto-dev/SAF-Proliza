@@ -1,6 +1,7 @@
 ﻿using CapaNegocios;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Windows.Forms;
 
@@ -17,7 +18,9 @@ namespace SAF_PROLIZA
         private void btnLogin_Click(object sender, EventArgs e)
         {
             //DataTable Usuario = Objetos.Usuario.ConsultarUsuarios(txtUsuario.Text, Seguridad.EncryptAES(txtPasword.Text)).Tables["Usuario"];
-            DataTable Usuario = new CNUsuarios().ConsultaLOGIN(txtUsuario.Text, Seguridad.EncryptAES(txtPasword.Text));
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+
+            DataTable Usuario = new CNUsuarios(connectionString).ConsultaLOGIN(txtUsuario.Text, Seguridad.EncryptAES(txtPasword.Text));
             //if (Usuario.Rows.Count == 1)
             if (Usuario.Rows.Count == 1)
             {

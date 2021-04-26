@@ -10,7 +10,22 @@ namespace CapaNegocios
 {
     public class CNFormulas
     {
+        private readonly CDInsumos cdInsumos;
+        private readonly CDFormulas cdFormulas;
+        private readonly CDDetallesFormula cdDetFormula;
+        private readonly CDDetallesProductos cdDetProducto;
+        private readonly CDProductos cdProductos;
+        private readonly CNInsumos cnInsumos;
 
+        public CNFormulas(string conexion)
+        {
+            cdInsumos = new CDInsumos(conexion);
+            cdFormulas = new CDFormulas(conexion);
+            cdDetFormula = new CDDetallesFormula(conexion);
+            cdDetProducto = new CDDetallesProductos(conexion);
+            cdProductos = new CDProductos(conexion);
+            cnInsumos = new CNInsumos(conexion, -1, null, false, 0);
+        }
         public int Guardar(int IdUser, FormulasModel Objeto, DataTable DetallesFormula)
         {
             int res;
@@ -18,11 +33,11 @@ namespace CapaNegocios
             {
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    res = new CDFormulas().Guardar(Objeto);
+                    res = cdFormulas.Guardar(Objeto);
                     if (res < 1)
                         throw new Exception("Error al guardar datos generales de la fórmula.");
                     foreach (DataRow item in DetallesFormula.Rows)
-                        new CDDetallesFormula().Guardar(new DetallesFormulasModel
+                        cdDetFormula.Guardar(new DetallesFormulasModel
                         {
                             IdDetalle = Convert.ToInt32(item["IdDetalle"]),
                             IdFormula = res,
@@ -35,7 +50,7 @@ namespace CapaNegocios
 
                     if (Objeto.IdFormula > 0)
                     {
-                        foreach (DataRow Producto in new CDProductos().ConsultaGridPorFormula(Objeto.IdFormula).Rows)
+                        foreach (DataRow Producto in cdProductos.ConsultaGridPorFormula(Objeto.IdFormula).Rows)
                         {
                             decimal CostoMinimoFormula = Objeto.UnidadMedida.ToString().Equals("K") ?
                                                         (Convert.ToDecimal(Objeto.CostoTotal) / (Objeto.Capacidad.ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(Objeto.Cantidad)) :
@@ -53,7 +68,7 @@ namespace CapaNegocios
 
 
                             List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
-                            foreach (DataRow detProducto in new CDDetallesProductos().ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
+                            foreach (DataRow detProducto in cdDetProducto.ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
                                 detalles.Add(new DetallesProductosModel
                                 {
                                     CostoInsumo = Convert.ToDecimal(detProducto["Precio"]),
@@ -69,22 +84,22 @@ namespace CapaNegocios
                                 CostoTotalProducto = detalles.Sum(x => x.CostoInsumo) + CostoGranel,
                                 Activo = true
                             };
-                            newProducto.IdProducto = new CDProductos().Guardar(newProducto);
+                            newProducto.IdProducto = cdProductos.Guardar(newProducto);
                             detalles.ForEach(x => x.IdProducto = newProducto.IdProducto);
-                            detalles.ForEach(x => new CDDetallesProductos().Guardar(x));
+                            detalles.ForEach(x => cdDetProducto.Guardar(x));
 
 
                         }
-                        new CDProductos().BorrarPorFormula(Objeto.IdFormula);
-                        if (new CDFormulas().Borrar(Objeto.IdFormula) < 1)
+                        cdProductos.BorrarPorFormula(Objeto.IdFormula);
+                        if (cdFormulas.Borrar(Objeto.IdFormula) < 1)
                             throw new Exception("No se han podido dar de baja " + Objeto.NombreFormula + ".\n Todos los cambios serán deshechos." +
                                                                    "Contacte al administrador del sistema.");
                     }
                     if (Objeto.IdFamilia == 1)
                     {//Es Insumo
-                        DataTable Insumo = new CDInsumos().ConsultaGridPorNombre(Objeto.NombreFormula);
+                        DataTable Insumo = cdInsumos.ConsultaGridPorNombre(Objeto.NombreFormula);
                         if (Insumo.Rows.Count == 0)
-                            new CDInsumos().Guardar(new InsumosModel
+                            cdInsumos.Guardar(new InsumosModel
                             {
                                 IdFamilia = 1,
                                 IdMoneda = 1,
@@ -97,7 +112,7 @@ namespace CapaNegocios
                             });
                         else
                         {
-                            new CNInsumos().Actualizar(IdUser, new InsumosModel
+                            cnInsumos.Actualizar(IdUser, new InsumosModel
                             {
                                 IdInsumo = Convert.ToInt32(Insumo.Rows[0]["IdInsumo"]),
                                 IdFamilia = 1,
@@ -144,7 +159,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().Actualizar(Parametro);
+                return cdFormulas.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -155,7 +170,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().Borrar(IdFormula);
+                return cdFormulas.Borrar(IdFormula);
             }
             catch (Exception er)
             {
@@ -166,7 +181,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().ConsultaGridActivas();
+                return cdFormulas.ConsultaGridActivas();
             }
             catch (Exception er)
             {
@@ -177,7 +192,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().ConsultaGridPorNombre(Nombre, Activo);
+                return cdFormulas.ConsultaGridPorNombre(Nombre, Activo);
             }
             catch (Exception er)
             {
@@ -188,7 +203,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().ConsultaGridIndividual(IdFormula);
+                return cdFormulas.ConsultaGridIndividual(IdFormula);
             }
             catch (Exception er)
             {
@@ -199,7 +214,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFormulas().ConsultaGridPorFamilia(IdFamilia);
+                return cdFormulas.ConsultaGridPorFamilia(IdFamilia);
             }
             catch (Exception er)
             {

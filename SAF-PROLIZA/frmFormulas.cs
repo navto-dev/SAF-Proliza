@@ -1,6 +1,7 @@
 ﻿using CapaNegocios;
 using Entidades;
 using System;
+using System.Configuration;
 using System.Windows.Forms;
 
 namespace SAF_PROLIZA
@@ -73,7 +74,7 @@ namespace SAF_PROLIZA
         {
             //BLL.BLLFamiliaFormulas FF = new BLL.BLLFamiliaFormulas(BLL.Gral.gStrConexion, BLL.Gral.gStrUsuario);
             //cmbFamilia.Properties.DataSource = FF.ConsultarFamilias().Tables["FamiliaFormulas"];
-            cmbFamilia.Properties.DataSource = new CNFamiliaFormulas().ConsultaGeneral();
+            cmbFamilia.Properties.DataSource = new CNFamiliaFormulas(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaGeneral();
             cmbFamilia.Properties.DisplayMember = "NombreFamilia";
             cmbFamilia.Properties.ValueMember = "IdFamilia";
             cmbFamilia.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("NombreFamilia"));

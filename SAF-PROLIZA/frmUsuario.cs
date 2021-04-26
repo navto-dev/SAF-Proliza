@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CapaNegocios;
+using DevExpress.Utils;
+using Entidades;
+using System;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using CapaNegocios;
-using DevExpress.Utils;
-using Entidades;
 
 namespace SAF_PROLIZA
 {
@@ -12,6 +13,8 @@ namespace SAF_PROLIZA
     {
         int Idusuario = 0;
         bool Guardar = false;
+        private readonly CNUsuarios cnUsuarios;
+
         private void ShowTooltip()
         {
             string formattedMessage = "Este nombre de usuario ya esta en uso. Selecciona otro.";
@@ -22,7 +25,7 @@ namespace SAF_PROLIZA
         {
             cmbRol.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Rol"));
             //cmbRol.Properties.DataSource = Objetos.Usuario.ConsultarRolesActivos().Tables["RolesUsuarios"];
-            cmbRol.Properties.DataSource = new CNUsuarios().ConsultaRolesActivos();
+            cmbRol.Properties.DataSource = cnUsuarios.ConsultaRolesActivos();
             cmbRol.Properties.ValueMember = "IdRol";
             cmbRol.Properties.DisplayMember = "Rol";
 
@@ -122,7 +125,7 @@ namespace SAF_PROLIZA
             frm.Idusuario = Id;
             if (Estaticos.IdUsuario == frm.Idusuario) frm.btnBorrar.Links[0].Visible = false;
             //DataTable User = Objetos.Usuario.ConsultaPorId(Id).Tables["Usuario"];
-            DataTable User = new CNUsuarios().ConsultaPorId(Id);
+            DataTable User = cnUsuarios.ConsultaPorId(Id);
             frm.txtNombre.Text = Convert.ToString(User.Rows[0]["Nombre"]);
             frm.txtUsername.Text = Convert.ToString(User.Rows[0]["Username"]);
             frm.txtPwd.Text = Seguridad.DecryptAES(Convert.ToString(User.Rows[0]["Pasword"]));
@@ -150,6 +153,9 @@ namespace SAF_PROLIZA
         public frmUsuario(string Accion)
         {
             InitializeComponent();
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+            cnUsuarios = new CNUsuarios(connectionString);
+
             HabilitaBotones(Accion);
             llenarComboRol();
         }
@@ -157,7 +163,7 @@ namespace SAF_PROLIZA
         private void txtUsername_Leave(object sender, EventArgs e)
         {
             //DataTable Username = Objetos.Usuario.ValidaUsername(txtUsername.Text).Tables["Usuario"];
-            DataTable Username = new CNUsuarios().ConsultaValidaUsername(txtUsername.Text);
+            DataTable Username = cnUsuarios.ConsultaValidaUsername(txtUsername.Text);
             if (Username.Rows.Count != 0)
             {
                 if (Convert.ToInt32(Username.Rows[0]["IdUsuario"]) != Estaticos.IdUsuario)
@@ -179,7 +185,7 @@ namespace SAF_PROLIZA
             if (ds == DialogResult.OK)
             {
                 //Objetos.Usuario.DarDeBajaUsuario(Idusuario);
-                new CNUsuarios().Borrar(Idusuario);
+                cnUsuarios.Borrar(Idusuario);
                 habilitarControles(true);
             }
         }
@@ -215,7 +221,7 @@ namespace SAF_PROLIZA
                         //{
                         //    Close();
                         //}
-                        if (new CNUsuarios().Guardar(AsignaGUIObjeto2()) > 0)
+                        if (cnUsuarios.Guardar(AsignaGUIObjeto2()) > 0)
                             Close();
                         else
                             MessageBox.Show("No se han podido gurdar los datos del usuario.");
@@ -228,7 +234,7 @@ namespace SAF_PROLIZA
                         //{
                         //    Close();
                         //}
-                        if (new CNUsuarios().Actualizar(AsignaGUIObjeto2()) > 0)
+                        if (cnUsuarios.Actualizar(AsignaGUIObjeto2()) > 0)
                             Close();
                         else
                             MessageBox.Show("No se han podido gurdar los datos del usuario.");

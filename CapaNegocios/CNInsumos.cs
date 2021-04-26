@@ -11,6 +11,12 @@ namespace CapaNegocios
 {
     public class CNInsumos
     {
+        private readonly CDInsumos cdInsumos;
+        private readonly CDFormulas cdFormulas;
+        private readonly CDDetallesFormula cdDetFormula;
+        private readonly CDDetallesProductos cdDetProducto;
+        private readonly CDProductos cdProductos;
+
         public int IdUsuario { get; set; }
         public InsumosModel Parametro { get; set; }
         public bool ActualizarPrecios { get; set; }
@@ -18,23 +24,24 @@ namespace CapaNegocios
         public string Msj { get; set; }
         public decimal PrecioDolar { get; set; }
 
-        public CNInsumos(int idUsuario, InsumosModel parametro, bool actualizarPrecios, decimal precioDolar)
+        public CNInsumos(string conexion, int idUsuario, InsumosModel parametro, bool actualizarPrecios, decimal precioDolar)
         {
+            cdInsumos = new CDInsumos(conexion);
+            cdFormulas = new CDFormulas(conexion);
+            cdDetFormula = new CDDetallesFormula(conexion);
+            cdDetProducto = new CDDetallesProductos(conexion);
+            cdProductos = new CDProductos(conexion);
             IdUsuario = idUsuario;
             Parametro = parametro;
             ActualizarPrecios = actualizarPrecios;
             PrecioDolar = precioDolar;
-        }
-        public CNInsumos()
-        {
-
         }
         public int Guardar(InsumosModel Objeto)
         {
             int res;
             try
             {
-                res = new CDInsumos().Guardar(Objeto);
+                res = cdInsumos.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -49,17 +56,17 @@ namespace CapaNegocios
             {
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    if (new CDInsumos().Actualizar(Parametro) < 1)
+                    if (cdInsumos.Actualizar(Parametro) < 1)
                         throw new Exception("No se han podido actualizar los datos del insumo.");
                     if (ActualizarPrecios)
                     {
                         int IdFormula = 0;
-                        foreach (DataRow item in new CDDetallesFormula().ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
+                        foreach (DataRow item in cdDetFormula.ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
                             if (Convert.ToInt32(item["IdFormula"]) != IdFormula)
                             {
                                 IdFormula = Convert.ToInt32(item["IdFormula"]);
-                                DataTable Formula = new CDFormulas().ConsultaGridIndividual(IdFormula);
-                                DataTable DetallesFormula = new CDDetallesFormula().ConsultaGridPorFormula(IdFormula);
+                                DataTable Formula = cdFormulas.ConsultaGridIndividual(IdFormula);
+                                DataTable DetallesFormula = cdDetFormula.ConsultaGridPorFormula(IdFormula);
                                 decimal CostoTotal = 0;
 
                                 FormulasModel NewFormula = new FormulasModel
@@ -70,7 +77,7 @@ namespace CapaNegocios
                                     NombreFormula = Formula.Rows[0]["NombreFormula"].ToString(),
                                     UnidadMedida = Formula.Rows[0]["UnidadMedida"].ToString()
                                 };
-                                NewFormula.IdFormula = new CDFormulas().Guardar(NewFormula);
+                                NewFormula.IdFormula = cdFormulas.Guardar(NewFormula);
                                 if (NewFormula.IdFormula < 1)
                                     throw new Exception("No se han podido actualizar el costo de " + item["NombreFormula"].ToString() + ".\n Todos los cambios serán deshechos." +
                                         "Contacte al administrador del sistema.");
@@ -79,7 +86,7 @@ namespace CapaNegocios
                                     decimal CostoInsumo = Convert.ToInt32(detalle["IdInsumo"]) != Parametro.IdInsumo ? Convert.ToDecimal(detalle["CostoInsumo"]) :
                                         ((Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (Convert.ToDecimal(detalle["CantidadInsumo"]) * FactorMedida(detalle["UnidadMedida"].ToString(), detalle["UnidadMedidaInsumo"].ToString())));
                                     CostoTotal += CostoInsumo;
-                                    if (new CDDetallesFormula().Guardar(new DetallesFormulasModel
+                                    if (cdDetFormula.Guardar(new DetallesFormulasModel
                                     {
                                         IdFormula = NewFormula.IdFormula,
                                         IdInsumo = Convert.ToInt32(detalle["IdInsumo"]),
@@ -102,7 +109,7 @@ namespace CapaNegocios
                                                          (Convert.ToDecimal(CostoTotal) / (NewFormula.Capacidad.ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(NewFormula.Cantidad)) :
                                                                                                       Convert.ToDecimal(NewFormula.Cantidad)));
 
-                                foreach (DataRow Producto in new CDProductos().ConsultaGridPorFormula(IdFormula).Rows)
+                                foreach (DataRow Producto in cdProductos.ConsultaGridPorFormula(IdFormula).Rows)
                                 {
                                     decimal CostoGranel = CostoMinimoFormula *
                                       (Producto["UnidadMedida"].ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(Producto["Cantidad"])) :
@@ -112,7 +119,7 @@ namespace CapaNegocios
 
 
                                     List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
-                                    foreach (DataRow detProducto in new CDDetallesProductos().ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
+                                    foreach (DataRow detProducto in cdDetProducto.ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
                                         detalles.Add(new DetallesProductosModel
                                         {
                                             CostoInsumo = Convert.ToDecimal(detProducto["Precio"]),
@@ -130,18 +137,18 @@ namespace CapaNegocios
                                         Activo = true,
                                         IdUsuario = IdUsuario
                                     };
-                                    newProducto.IdProducto = new CDProductos().Actualizar(newProducto);
+                                    newProducto.IdProducto = cdProductos.Actualizar(newProducto);
                                     //detalles.ForEach(x => x.IdProducto = newProducto.IdProducto);
-                                    detalles.ForEach(x => new CDDetallesProductos().Actualizar(x));
+                                    detalles.ForEach(x => cdDetProducto.Actualizar(x));
 
 
                                 }
-                                //new CDProductos().BorrarPorFormula(IdFormula);
-                                if (new CDFormulas().Borrar(IdFormula) < 1)
+                                //cdProductos.BorrarPorFormula(IdFormula);
+                                if (cdFormulas.Borrar(IdFormula) < 1)
                                     throw new Exception("No se han podido dar de baja " + item["NombreFormula"].ToString() + ".\n Todos los cambios serán deshechos." +
                                                                            "Contacte al administrador del sistema.");
 
-                                foreach (DataRow itemInsumo in new CDInsumos().ConsultaGridPorNombre(item["NombreFormula"].ToString()).Rows)
+                                foreach (DataRow itemInsumo in cdInsumos.ConsultaGridPorNombre(item["NombreFormula"].ToString()).Rows)
                                 {
                                     Actualizar(IdUsuario, new InsumosModel
                                     {
@@ -165,16 +172,16 @@ namespace CapaNegocios
                             }
 
                         int IdProducto = 0;
-                        foreach (DataRow itemDetalle in new CDDetallesProductos().ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
+                        foreach (DataRow itemDetalle in cdDetProducto.ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
                         {
                             if (Convert.ToInt32(itemDetalle["IdProducto"]) != IdProducto)
                             {
                                 IdProducto = Convert.ToInt32(itemDetalle["IdProducto"]);
-                                DataTable Producto = new CDProductos().ConsultaGridPorId(IdProducto);
+                                DataTable Producto = cdProductos.ConsultaGridPorId(IdProducto);
                                 if ((bool)(Producto.Rows[0]["Activo"]))
                                 {
                                     List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
-                                    foreach (DataRow detProducto in new CDDetallesProductos().ConsultaGridPorProducto(IdProducto).Rows)
+                                    foreach (DataRow detProducto in cdDetProducto.ConsultaGridPorProducto(IdProducto).Rows)
                                     {
                                         decimal CostoInsumo = Convert.ToInt32(detProducto["IdInsumo"]) != Parametro.IdInsumo ? Convert.ToDecimal(detProducto["Precio"]) :
                                             (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar);
@@ -197,10 +204,10 @@ namespace CapaNegocios
                                         Activo = true,
                                         IdUsuario = IdUsuario
                                     };
-                                    newProducto.IdProducto = new CDProductos().Actualizar(newProducto);
+                                    newProducto.IdProducto = cdProductos.Actualizar(newProducto);
                                     //detalles.ForEach(x => x.IdProducto = newProducto.IdProducto);
-                                    detalles.ForEach(x => new CDDetallesProductos().Actualizar(x));
-                                    //if (new CDProductos().BorrarPorId(IdProducto) < 1)
+                                    detalles.ForEach(x => cdDetProducto.Actualizar(x));
+                                    //if (cdProductos.BorrarPorId(IdProducto) < 1)
                                     //    throw new Exception("No se ha podido dar de baja " + newProducto.NombreProducto + ".\n Todos los cambios serán deshechos." +
                                     //                                           "Contacte al administrador del sistema.");
                                 }
@@ -224,309 +231,152 @@ namespace CapaNegocios
             {
                 //Thread.Sleep(2000);
 
-                //using (TransactionScope scope = new TransactionScope())
-                //{
-                //using (sdprolizaEntities contexto = new sdprolizaEntities())
-                //{
-                //    var insumo = contexto.Insumos.Find(Parametro.IdInsumo);
-                //    if (insumo is null)
-                //        throw new Exception("Insumo no encontrado.");
-                //    insumo.PrecioUnitario = Convert.ToDecimal(Parametro.PrecioUnitario);
-                //    insumo.NombreInsumo = Parametro.NombreInsumo;
-                //    insumo.NombreInterno = Parametro.NombreInterno;
-                //    insumo.UnidadMedida = Parametro.UnidadMedida;
-                //    insumo.IdMoneda = Parametro.IdMoneda;
-                //    insumo.IdFamilia = Parametro.IdFamilia;
-                //    insumo.IdProveedor = Parametro.IdProveedor;
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    #region
+                    if (cdInsumos.Actualizar(Parametro) < 1)
+                        throw new Exception("No se han podido actualizar los datos del insumo.");
 
-                //    if (Parametro.ActualizaFormulas)
-                //    {
+                    if (ActualizarPrecios)
+                    {
+                        int IdFormula = 0;
+                        foreach (DataRow item in cdDetFormula.ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
+                            if (Convert.ToInt32(item["IdFormula"]) != IdFormula)
+                            {
+                                IdFormula = Convert.ToInt32(item["IdFormula"]);
+                                cdDetFormula.Actualizar(new DetallesFormulasModel
+                                {
+                                    IdDetalle = Convert.ToInt32(item[0]),
+                                    IdFormula = Convert.ToInt32(item[1]),
+                                    IdInsumo = Parametro.IdInsumo,
+                                    CantidadInsumo = Convert.ToInt32(item["CantidadInsumo"]),
+                                    UnidadMedidaInsumo = item["UnidadMedidaInsumo"].ToString(),
+                                    CostoInsumo = ((Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (Convert.ToDecimal(item["CantidadInsumo"]) *
+                                    FactorMedida(item["UnidadMedida"].ToString(), item["UnidadMedidaInsumo"].ToString()))),
+                                    IdUsuario = Parametro.IdUsuario
+                                });
 
-                //        List<int> FormulasInsumo = contexto.DetallesFormulas.Where(x => x.IdInsumo == Parametro.IdInsumo && x.Formulas.Activo).Select(y => y.IdFormula).ToList();
-                //        List<Formulas> lstFormulas = contexto.Formulas.Where(x => FormulasInsumo.Contains(x.IdFormula)).ToList();
-                //        List<Formulas> lstNewFormulas = new List<Formulas>();
+                                DataTable tblFormula = cdFormulas.ConsultaGridIndividual(IdFormula);
 
-                //        List<int> ProductosInsumo = contexto.DetallesProductos.Where(x => x.IdInsumo == Parametro.IdInsumo && x.ProductosTerminados.Activo).Select(y => y.IdProducto).ToList();
-                //        List<ProductosTerminados> lstProductos = contexto.ProductosTerminados.Where(x => ProductosInsumo.Contains(x.IdProducto)).ToList();
-                //        List<ProductosTerminados> lstNewProductos = new List<ProductosTerminados>();
+                                FormulasModel formula = new FormulasModel
+                                {
+                                    Cantidad = Convert.ToDouble(tblFormula.Rows[0]["Cantidad"]),
+                                    Capacidad = tblFormula.Rows[0]["Capacidad"].ToString(),
+                                    IdFamilia = Convert.ToInt32(tblFormula.Rows[0]["IdFamilia"]),
+                                    NombreFormula = tblFormula.Rows[0]["NombreFormula"].ToString(),
+                                    UnidadMedida = tblFormula.Rows[0]["UnidadMedida"].ToString(),
+                                    CostoTotal = Convert.ToDecimal(tblFormula.Rows[0]["CostoTotal"]),
+                                    IdFormula = Convert.ToInt32(tblFormula.Rows[0]["IdFormula"]),
+                                };
 
-                //        lstFormulas.ForEach(x =>
-                //        {
-                //            var detalles = contexto.DetallesFormulas.Where(y => y.IdFormula == x.IdFormula).ToList();
-                //            var newDetalles = new List<DetallesFormulas>();
-                //            var productos = contexto.ProductosTerminados.Where(p => p.Activo && p.IdFormula == x.IdFormula).ToList();
-                //            var newProductos = new List<ProductosTerminados>();
-                //            detalles.ForEach(y =>
-                //            {
-                //                newDetalles.Add(new DetallesFormulas
-                //                {
-                //                    Activo = true,
-                //                    CantidadInsumo = y.CantidadInsumo,
-                //                    FechaCreo = DateTime.Now,
-                //                    IdInsumo = y.IdInsumo,
-                //                    IdUsuarioCreo = Parametro.IdUsuario,
-                //                    CostoInsumo = y.IdInsumo != Parametro.IdInsumo ? y.CostoInsumo :
-                //                    (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (y.CantidadInsumo * FactorMedida(y.Insumos.UnidadMedida, y.UnidadMedidaInsumo)),
-                //                    UnidadMedidaInsumo = y.UnidadMedidaInsumo
-                //                });
-                //            });
-                //            var newFormula = new Formulas
-                //            {
-                //                Activo = true,
-                //                Cantidad = x.Cantidad,
-                //                Capacidad = x.Capacidad,
-                //                CostoTotal = newDetalles.Select(y => y.CostoInsumo).Sum(),
-                //                DetallesFormulas = newDetalles,
-                //                NombreFormula = x.NombreFormula,
-                //                UnidadMedida = x.UnidadMedida,
-                //                IdFamilia = x.IdFamilia,
-                //                FechaElaboracion = DateTime.Now,
-                //            };
-                //            decimal CostoMinimoFormula = newFormula.UnidadMedida.Equals("K") ?
-                //            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
-                //                                                            newFormula.Capacidad.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(newFormula.Cantidad)) :
-                //                                                            Convert.ToDecimal(newFormula.Cantidad))) :
-                //            (Convert.ToDecimal(newFormula.CostoTotal) / (newFormula.Capacidad.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(newFormula.Cantidad)) :
-                //                                                            Convert.ToDecimal(newFormula.Cantidad)));
+                                //calculo el costo de generar la unidad mas pequeña de la formula
+                                //por ejemplo, si son kg, cuanto cuesta  crear un mg?
+                                // si son Litros, cuanto cuesta crear un ml?
+                                decimal CostoMinimoFormula = formula.UnidadMedida.ToString().Equals("K") ?
+                                                         (Convert.ToDecimal(formula.CostoTotal) / (formula.Capacidad.ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(formula.Cantidad)) :
+                                                                                                      formula.Capacidad.ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(formula.Cantidad)) :
+                                                                                                      Convert.ToDecimal(formula.Cantidad))) :
+                                                         (Convert.ToDecimal(formula.CostoTotal) / (formula.Capacidad.ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(formula.Cantidad)) :
+                                                                                                      Convert.ToDecimal(formula.Cantidad)));
 
-                //            productos.ForEach(prod =>
-                //            {
-                //                decimal CostoGranel = CostoMinimoFormula *
-                //                                  (prod.UnidadMedida.ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(prod.Cantidad)) :
-                //                                prod.UnidadMedida.ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
-                //                                 prod.UnidadMedida.ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(prod.Cantidad)) :
-                //                                  Convert.ToDecimal(prod.Cantidad));
-                //                var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
-                //                prod.DetallesProductos = new List<DetallesProductos>();
-                //                detProd.ForEach(dp =>
-                //                {
-                //                    prod.DetallesProductos.Add(new DetallesProductos
-                //                    {
-                //                        CostoInsumo = dp.CostoInsumo,
-                //                        IdInsumo = dp.IdInsumo,
-
-                //                    });
-                //                });
-                //                newProductos.Add(new ProductosTerminados
-                //                {
-                //                    Activo = true,
-                //                    Cantidad = prod.Cantidad,
-                //                    FechaCreo = DateTime.Now,
-                //                    IdUsuarioCreo = Parametro.IdUsuario,
-                //                    NombreProducto = prod.NombreProducto,
-                //                    UnidadMedida = prod.UnidadMedida,
-                //                    CostoUnitario = CostoGranel,
-                //                    CostoTotalProducto = prod.DetallesProductos.Sum(dp => dp.CostoInsumo) + CostoGranel,
-                //                });
-                //            });
-                //            newFormula.ProductosTerminados = newProductos;
-                //            lstNewFormulas.Add(newFormula);
-
-                //            x.Activo = false;
-                //        });
-                //        lstProductos.ForEach(prod =>
-                //        {
-                //            var detProd = contexto.DetallesProductos.Where(dp => dp.IdProducto == prod.IdProducto).ToList();
-                //            var detalles = new List<DetallesProductos>();
-                //            detProd.ForEach(dp =>
-                //            {
-                //                detalles.Add(new DetallesProductos
-                //                {
-                //                    CostoInsumo = dp.CostoInsumo,
-                //                    IdInsumo = dp.IdInsumo,
-
-                //                });
-                //            });
-                //            lstNewProductos.Add(new ProductosTerminados
-                //            {
-                //                Activo = true,
-                //                Cantidad = prod.Cantidad,
-                //                FechaCreo = DateTime.Now,
-                //                IdUsuarioCreo = Parametro.IdUsuario,
-                //                NombreProducto = prod.NombreProducto,
-                //                UnidadMedida = prod.UnidadMedida,
-                //                CostoUnitario = prod.CostoUnitario,
-                //                CostoTotalProducto = detalles.Sum(dp => dp.CostoInsumo) + prod.CostoUnitario,
-                //                IdFormula = prod.IdFormula,
-                //                DetallesProductos = detalles
-
-                //            });
-                //            prod.Activo = false;
-                //            prod.FechaModifica = DateTime.Now;
-                //            prod.IdUsuarioModifica = Parametro.IdUsuario;
-                //        });
-                //        contexto.Formulas.AddRange(lstNewFormulas);
-                //        contexto.ProductosTerminados.AddRange(lstNewProductos);
-                //    }
-
-                //    contexto.SaveChanges();
-
-                //}
-                #region
-                //if (new CDInsumos().Actualizar(Parametro) < 1)
-                //    throw new Exception("No se han podido actualizar los datos del insumo.");
-                //if (new CDInsumos().ActualizarV2(Parametro) < 1)
-                if (new CDInsumos().ActualizarV2(Parametro) < 1)
-                    throw new Exception("No se han podido actualizar los datos del insumo.");
-                //if (ActualizarPrecios)
-                //{
-                //    int IdFormula = 0;
-                //    foreach (DataRow item in new CDDetallesFormula().ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
-                //        if (Convert.ToInt32(item["IdFormula"]) != IdFormula)
-                //        {
-                //            IdFormula = Convert.ToInt32(item["IdFormula"]);
-                //            DataTable Formula = new CDFormulas().ConsultaGridIndividual(IdFormula);
-                //            DataTable DetallesFormula = new CDDetallesFormula().ConsultaGridPorFormula(IdFormula);
-                //            decimal CostoTotal = 0;
-
-                //            FormulasModel NewFormula = new FormulasModel
-                //            {
-                //                Cantidad = Convert.ToDouble(Formula.Rows[0]["Cantidad"]),
-                //                Capacidad = Formula.Rows[0]["Capacidad"].ToString(),
-                //                IdFamilia = Convert.ToInt32(Formula.Rows[0]["IdFamilia"]),
-                //                NombreFormula = Formula.Rows[0]["NombreFormula"].ToString(),
-                //                UnidadMedida = Formula.Rows[0]["UnidadMedida"].ToString()
-                //            };
-                //            NewFormula.IdFormula = new CDFormulas().Guardar(NewFormula);
-                //            if (NewFormula.IdFormula < 1)
-                //                throw new Exception("No se han podido actualizar el costo de " + item["NombreFormula"].ToString() + ".\n Todos los cambios serán deshechos." +
-                //                    "Contacte al administrador del sistema.");
-                //            foreach (DataRow detalle in DetallesFormula.Rows)
-                //            {
-                //                decimal CostoInsumo = Convert.ToInt32(detalle["IdInsumo"]) != Parametro.IdInsumo ? Convert.ToDecimal(detalle["CostoInsumo"]) :
-                //                    ((Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar) * (Convert.ToDecimal(detalle["CantidadInsumo"]) * FactorMedida(detalle["UnidadMedida"].ToString(), detalle["UnidadMedidaInsumo"].ToString())));
-                //                CostoTotal += CostoInsumo;
-                //                if (new CDDetallesFormula().Guardar(new DetallesFormulasModel
-                //                {
-                //                    IdFormula = NewFormula.IdFormula,
-                //                    IdInsumo = Convert.ToInt32(detalle["IdInsumo"]),
-                //                    CantidadInsumo = Convert.ToDecimal(detalle["CantidadInsumo"]),
-                //                    UnidadMedidaInsumo = detalle["UnidadMedidaInsumo"].ToString(),
-                //                    CostoInsumo = CostoInsumo,
-                //                    IdUsuario = IdUsuario
-                //                }) < 1)
-                //                    throw new Exception("No se han podido actualizar el costo en los detalles de " + item["NombreFormula"].ToString() + ".\n Todos los cambios serán deshechos." +
-                //                     "Contacte al administrador del sistema.");
-                //            }
-                //            //calculo el costo de generar la unidad mas pequeña de la formula
-                //            //por ejemplo, si son kg, cuanto cuesta  crear un mg?
-                //            // si son Litros, cuanto cuesta crear un ml?
-
-                //            decimal CostoMinimoFormula = NewFormula.UnidadMedida.ToString().Equals("K") ?
-                //                                     (Convert.ToDecimal(CostoTotal) / (NewFormula.Capacidad.ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                                                                  NewFormula.Capacidad.ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                                                                  Convert.ToDecimal(NewFormula.Cantidad))) :
-                //                                     (Convert.ToDecimal(CostoTotal) / (NewFormula.Capacidad.ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                                                                  Convert.ToDecimal(NewFormula.Cantidad)));
-
-                //            foreach (DataRow Producto in new CDProductos().ConsultaGridPorFormula(IdFormula).Rows)
-                //            {
-                //                decimal CostoGranel = CostoMinimoFormula *
-                //                  (Producto["UnidadMedida"].ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(Producto["Cantidad"])) :
-                //                 Producto["UnidadMedida"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(Producto["Cantidad"])) :
-                //                 Producto["UnidadMedida"].ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(Producto["Cantidad"])) :
-                //                  Convert.ToDecimal(Producto["Cantidad"]));
+                                foreach (DataRow Producto in cdProductos.ConsultaGridPorFormula(IdFormula).Rows)
+                                {
+                                    decimal CostoGranel = CostoMinimoFormula *
+                                      (Producto["UnidadMedida"].ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(Producto["Cantidad"])) :
+                                     Producto["UnidadMedida"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(Producto["Cantidad"])) :
+                                     Producto["UnidadMedida"].ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(Producto["Cantidad"])) :
+                                      Convert.ToDecimal(Producto["Cantidad"]));
 
 
-                //                List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
-                //                foreach (DataRow detProducto in new CDDetallesProductos().ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
-                //                    detalles.Add(new DetallesProductosModel
-                //                    {
-                //                        CostoInsumo = Convert.ToDecimal(detProducto["Precio"]),
-                //                        IdInsumo = Convert.ToInt32(detProducto["IdInsumo"])
-                //                    });
-                //                ProductosModel newProducto = new ProductosModel
-                //                {
-                //                    IdProducto = Convert.ToInt32(Producto["IdProducto"]),
-                //                    IdFormula = NewFormula.IdFormula,
-                //                    NombreProducto = Producto["NombreProducto"].ToString(),
-                //                    Cantidad = Convert.ToDecimal(Producto["Cantidad"]),
-                //                    UnidadMedida = Producto["UnidadMedida"].ToString(),
-                //                    CostoUnitario = CostoGranel,
-                //                    CostoTotalProducto = detalles.Sum(x => x.CostoInsumo) + CostoGranel,
-                //                    Activo = true,
-                //                    IdUsuario = IdUsuario
-                //                };
-                //                newProducto.IdProducto = new CDProductos().Actualizar(newProducto);
-                //                //detalles.ForEach(x => x.IdProducto = newProducto.IdProducto);
-                //                detalles.ForEach(x => new CDDetallesProductos().Actualizar(x));
+                                    List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
+                                    foreach (DataRow detProducto in cdDetProducto.ConsultaGridPorProducto(Convert.ToInt32(Producto["IdProducto"])).Rows)
+                                        detalles.Add(new DetallesProductosModel
+                                        {
+                                            CostoInsumo = Convert.ToDecimal(detProducto["Precio"]),
+                                            IdInsumo = Convert.ToInt32(detProducto["IdInsumo"])
+                                        });
+                                    ProductosModel newProducto = new ProductosModel
+                                    {
+                                        IdProducto = Convert.ToInt32(Producto["IdProducto"]),
+                                        IdFormula = formula.IdFormula,
+                                        NombreProducto = Producto["NombreProducto"].ToString(),
+                                        Cantidad = Convert.ToDecimal(Producto["Cantidad"]),
+                                        UnidadMedida = Producto["UnidadMedida"].ToString(),
+                                        CostoUnitario = CostoGranel,
+                                        CostoTotalProducto = detalles.Sum(x => x.CostoInsumo) + CostoGranel,
+                                        Activo = true,
+                                        IdUsuario = IdUsuario
+                                    };
+                                    newProducto.IdProducto = cdProductos.Actualizar(newProducto);
 
 
-                //            }
-                //            //new CDProductos().BorrarPorFormula(IdFormula);
-                //            if (new CDFormulas().Borrar(IdFormula) < 1)
-                //                throw new Exception("No se han podido dar de baja " + item["NombreFormula"].ToString() + ".\n Todos los cambios serán deshechos." +
-                //                                                       "Contacte al administrador del sistema.");
+                                }                              
 
-                //            foreach (DataRow itemInsumo in new CDInsumos().ConsultaGridPorNombre(item["NombreFormula"].ToString()).Rows)
-                //            {
-                //                Actualizar(IdUsuario, new InsumosModel
-                //                {
-                //                    IdInsumo = Convert.ToInt32(itemInsumo["IdInsumo"]),
-                //                    IdProveedor = Convert.ToInt32(itemInsumo["IdProveedor"]),
-                //                    NombreInsumo = itemInsumo["NombreInsumo"].ToString(),
-                //                    NombreInterno = itemInsumo["NombreInterno"].ToString(),
-                //                    UnidadMedida = itemInsumo["UnidadMedida"].ToString(),
-                //                    PrecioUnitario = Convert.ToDouble(CostoMinimoFormula *
-                //                                  (itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                 itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                 itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(NewFormula.Cantidad)) :
-                //                                  Convert.ToDecimal(1))),
-                //                    TotalCompraMX = 10000,
-                //                    IdFamilia = Convert.ToInt32(itemInsumo["IdFamilia"]),
-                //                    IdMoneda = Convert.ToInt32(itemInsumo["IdMoneda"]),
+                                foreach (DataRow itemInsumo in cdInsumos.ConsultaGridPorNombre(item["NombreFormula"].ToString()).Rows)
+                                {
+                                    Actualizar(IdUsuario, new InsumosModel
+                                    {
+                                        IdInsumo = Convert.ToInt32(itemInsumo["IdInsumo"]),
+                                        IdProveedor = Convert.ToInt32(itemInsumo["IdProveedor"]),
+                                        NombreInsumo = itemInsumo["NombreInsumo"].ToString(),
+                                        NombreInterno = itemInsumo["NombreInterno"].ToString(),
+                                        UnidadMedida = itemInsumo["UnidadMedida"].ToString(),
+                                        PrecioUnitario = Convert.ToDouble(CostoMinimoFormula *
+                                                      (itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("L") ? ConversorUnidades.Litros_Mililitros(Convert.ToDecimal(formula.Cantidad)) :
+                                                     itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(formula.Cantidad)) :
+                                                     itemInsumo["UnidadMedida"].ToString().ToUpper().StartsWith("G") ? ConversorUnidades.Gramos_Miligramos(Convert.ToDecimal(formula.Cantidad)) :
+                                                      Convert.ToDecimal(1))),
+                                        TotalCompraMX = 10000,
+                                        IdFamilia = Convert.ToInt32(itemInsumo["IdFamilia"]),
+                                        IdMoneda = Convert.ToInt32(itemInsumo["IdMoneda"]),
 
-                //                }, true, out string MsjI, PrecioDolar);
-                //            }
+                                    }, true, out string MsjI, PrecioDolar);
+                                }
 
-                //        }
+                            }
 
-                //    int IdProducto = 0;
-                //    foreach (DataRow itemDetalle in new CDDetallesProductos().ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
-                //    {
-                //        if (Convert.ToInt32(itemDetalle["IdProducto"]) != IdProducto)
-                //        {
-                //            IdProducto = Convert.ToInt32(itemDetalle["IdProducto"]);
-                //            DataTable Producto = new CDProductos().ConsultaGridPorId(IdProducto);
-                //            if ((bool)(Producto.Rows[0]["Activo"]))
-                //            {
-                //                List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
-                //                foreach (DataRow detProducto in new CDDetallesProductos().ConsultaGridPorProducto(IdProducto).Rows)
-                //                {
-                //                    decimal CostoInsumo = Convert.ToInt32(detProducto["IdInsumo"]) != Parametro.IdInsumo ? Convert.ToDecimal(detProducto["Precio"]) :
-                //                        (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar);
-                //                    detalles.Add(new DetallesProductosModel
-                //                    {
-                //                        CostoInsumo = CostoInsumo,
-                //                        IdDetalle = Convert.ToInt32(detProducto["IdDetalle"]),
-                //                        IdInsumo = Convert.ToInt32(detProducto["IdInsumo"])
-                //                    });
-                //                }
-                //                ProductosModel newProducto = new ProductosModel
-                //                {
-                //                    IdProducto = Convert.ToInt32(Producto.Rows[0]["IdProducto"]),
-                //                    IdFormula = Convert.ToInt32(Producto.Rows[0]["IdFormula"]),
-                //                    NombreProducto = Producto.Rows[0]["NombreProducto"].ToString(),
-                //                    Cantidad = Convert.ToDecimal(Producto.Rows[0]["Cantidad"]),
-                //                    UnidadMedida = Producto.Rows[0]["UnidadMedida"].ToString(),
-                //                    CostoUnitario = Convert.ToDecimal(Producto.Rows[0]["CostoUnitario"]),
-                //                    CostoTotalProducto = detalles.Sum(x => x.CostoInsumo) + Convert.ToDecimal(Producto.Rows[0]["CostoUnitario"]),
-                //                    Activo = true,
-                //                    IdUsuario = IdUsuario
-                //                };
-                //                newProducto.IdProducto = new CDProductos().Actualizar(newProducto);
-                //                //detalles.ForEach(x => x.IdProducto = newProducto.IdProducto);
-                //                detalles.ForEach(x => new CDDetallesProductos().Actualizar(x));
-                //                //if (new CDProductos().BorrarPorId(IdProducto) < 1)
-                //                //    throw new Exception("No se ha podido dar de baja " + newProducto.NombreProducto + ".\n Todos los cambios serán deshechos." +
-                //                //                                           "Contacte al administrador del sistema.");
-                //            }
-                //        }
-                //    }
-                //}
-                #endregion
-                //    scope.Complete();
-                //}
+                        int IdProducto = 0;
+                        foreach (DataRow itemDetalle in cdDetProducto.ConsultaGridPorInsumo(Parametro.IdInsumo).Rows)
+                        {
+                            if (Convert.ToInt32(itemDetalle["IdProducto"]) != IdProducto)
+                            {
+                                IdProducto = Convert.ToInt32(itemDetalle["IdProducto"]);
+                                DataTable Producto = cdProductos.ConsultaGridPorId(IdProducto);
+                                if ((bool)(Producto.Rows[0]["Activo"]))
+                                {
+                                    List<DetallesProductosModel> detalles = new List<DetallesProductosModel>();
+                                    foreach (DataRow detProducto in cdDetProducto.ConsultaGridPorProducto(IdProducto).Rows)
+                                    {
+                                        decimal CostoInsumo = Convert.ToInt32(detProducto["IdInsumo"]) != Parametro.IdInsumo ? Convert.ToDecimal(detProducto["Precio"]) :
+                                            (Convert.ToDecimal(Parametro.PrecioUnitario) * PrecioDolar);
+                                        detalles.Add(new DetallesProductosModel
+                                        {
+                                            CostoInsumo = CostoInsumo,
+                                            IdDetalle = Convert.ToInt32(detProducto["IdDetalle"]),
+                                            IdInsumo = Convert.ToInt32(detProducto["IdInsumo"])
+                                        });
+                                    }
+                                    ProductosModel newProducto = new ProductosModel
+                                    {
+                                        IdProducto = Convert.ToInt32(Producto.Rows[0]["IdProducto"]),
+                                        IdFormula = Convert.ToInt32(Producto.Rows[0]["IdFormula"]),
+                                        NombreProducto = Producto.Rows[0]["NombreProducto"].ToString(),
+                                        Cantidad = Convert.ToDecimal(Producto.Rows[0]["Cantidad"]),
+                                        UnidadMedida = Producto.Rows[0]["UnidadMedida"].ToString(),
+                                        CostoUnitario = Convert.ToDecimal(Producto.Rows[0]["CostoUnitario"]),
+                                        CostoTotalProducto = detalles.Sum(x => x.CostoInsumo) + Convert.ToDecimal(Producto.Rows[0]["CostoUnitario"]),
+                                        Activo = true,
+                                        IdUsuario = IdUsuario
+                                    };
+                                    newProducto.IdProducto = cdProductos.Actualizar(newProducto);
+                                    detalles.ForEach(x => cdDetProducto.Actualizar(x));
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+                    scope.Complete();
+                }
                 Msj = "";
                 EstadoOperacion = true;
 
@@ -572,7 +422,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridGeneral();
+                return cdInsumos.ConsultaGridGeneral();
             }
             catch (Exception er)
             {
@@ -583,7 +433,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridPorId(Id);
+                return cdInsumos.ConsultaGridPorId(Id);
             }
             catch (Exception er)
             {
@@ -594,7 +444,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridPorProveedor(IdProveedor);
+                return cdInsumos.ConsultaGridPorProveedor(IdProveedor);
             }
             catch (Exception er)
             {
@@ -605,7 +455,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridPorFamilia(IdFamilia);
+                return cdInsumos.ConsultaGridPorFamilia(IdFamilia);
             }
             catch (Exception er)
             {
@@ -616,7 +466,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridPorNombre(Nombre);
+                return cdInsumos.ConsultaGridPorNombre(Nombre);
             }
             catch (Exception er)
             {
@@ -627,7 +477,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridIngredientes();
+                return cdInsumos.ConsultaGridIngredientes();
             }
             catch (Exception er)
             {
@@ -638,7 +488,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridAcabados();
+                return cdInsumos.ConsultaGridAcabados();
             }
             catch (Exception er)
             {
@@ -649,7 +499,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().ConsultaGridPorMoneda(IdMoneda);
+                return cdInsumos.ConsultaGridPorMoneda(IdMoneda);
             }
             catch (Exception er)
             {
@@ -661,7 +511,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDInsumos().Borrar(IdInsumo);
+                return cdInsumos.Borrar(IdInsumo);
             }
             catch (Exception er)
             {

@@ -7,12 +7,18 @@ namespace CapaNegocios
 {
     public class CNProductos
     {
+        private readonly CDProductos cdProductos;
+
+        public CNProductos(string conexion)
+        {
+            cdProductos = new CDProductos(conexion);
+        }
         public int Guardar(ProductosModel Objeto)
         {
             int res;
             try
             {
-                res = new CDProductos().Guardar(Objeto);
+                res = cdProductos.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -25,7 +31,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().Actualizar(Parametro);
+                return cdProductos.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -36,7 +42,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().BorrarPorFormula(IdFormula);
+                return cdProductos.BorrarPorFormula(IdFormula);
             }
             catch (Exception er)
             {
@@ -47,7 +53,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().BorrarPorId(IdProducto);
+                return cdProductos.BorrarPorId(IdProducto);
             }
             catch (Exception er)
             {
@@ -58,7 +64,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridActivos();
+                return cdProductos.ConsultaGridActivos();
             }
             catch (Exception er)
             {
@@ -69,7 +75,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridCatalogo();
+                return cdProductos.ConsultaGridCatalogo();
             }
             catch (Exception er)
             {
@@ -80,7 +86,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridPorNombre(Nombre);
+                return cdProductos.ConsultaGridPorNombre(Nombre);
             }
             catch (Exception er)
             {
@@ -91,7 +97,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridPorId(IdProducto);
+                return cdProductos.ConsultaGridPorId(IdProducto);
             }
             catch (Exception er)
             {
@@ -102,7 +108,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridPorFormula(IdFormula);
+                return cdProductos.ConsultaGridPorFormula(IdFormula);
             }
             catch (Exception er)
             {
@@ -113,7 +119,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProductos().ConsultaGridVariedades(IdFormula, NombreProducto);
+                return cdProductos.ConsultaGridVariedades(IdFormula, NombreProducto);
             }
             catch (Exception er)
             {

@@ -6,14 +6,21 @@ using System.Data;
 
 namespace CapaNegocios
 {
+
     public class CNUsuarios
     {
+        private readonly CDUsuarios cdUsuario;
+        public CNUsuarios(string conexion)
+        {
+            cdUsuario = new CDUsuarios(conexion);
+        }
+
         public int Guardar(UsuariosModel Objeto)
         {
             int res;
             try
             {
-                res = new CDUsuarios().Guardar(Objeto);
+                res = cdUsuario.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -26,7 +33,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().Actualizar(Parametro);
+                return cdUsuario.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -37,7 +44,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridValidaUserName(Username);
+                return cdUsuario.ConsultaGridValidaUserName(Username);
             }
             catch (Exception er)
             {
@@ -48,7 +55,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridGeneral();
+                return cdUsuario.ConsultaGridGeneral();
             }
             catch (Exception er)
             {
@@ -59,7 +66,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridLOGIN(username, Pwd);
+                return cdUsuario.ConsultaGridLOGIN(username, Pwd);
             }
             catch (Exception er)
             {
@@ -70,7 +77,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridPorId(IdUsuario);
+                return cdUsuario.ConsultaGridPorId(IdUsuario);
             }
             catch (Exception er)
             {
@@ -81,7 +88,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridRolesActivos();
+                return cdUsuario.ConsultaGridRolesActivos();
             }
             catch (Exception er)
             {
@@ -92,7 +99,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().Borrar(IdUsuario);
+                return cdUsuario.Borrar(IdUsuario);
             }
             catch (Exception er)
             {
@@ -106,7 +113,7 @@ namespace CapaNegocios
             int res;
             try
             {
-                res = new CDUsuarios().GuardarRespaldo();
+                res = cdUsuario.GuardarRespaldo();
             }
             catch (Exception)
             {
@@ -120,7 +127,7 @@ namespace CapaNegocios
             int res;
             try
             {
-                res = new CDUsuarios().GuardarRespaldo(ruta);
+                res = cdUsuario.GuardarRespaldo(ruta);
             }
             catch (Exception)
             {
@@ -133,7 +140,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDUsuarios().ConsultaGridRespaldoPorFecha(Mes, anio);
+                return cdUsuario.ConsultaGridRespaldoPorFecha(Mes, anio);
             }
             catch (Exception er)
             {

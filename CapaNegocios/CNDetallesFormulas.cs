@@ -7,12 +7,18 @@ namespace CapaNegocios
 {
     public class CNDetallesFormulas
     {
+        private readonly CDDetallesFormula cdDetallesFormula;
+
+        public CNDetallesFormulas(string conexion)
+        {
+            cdDetallesFormula = new CDDetallesFormula(conexion);
+        }
         public int Guardar(DetallesFormulasModel Objeto)
         {
             int res;
             try
             {
-                res = new CDDetallesFormula().Guardar(Objeto);
+                res = cdDetallesFormula.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -25,7 +31,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().Actualizar(Parametro);
+                return cdDetallesFormula.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -37,7 +43,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().Borrar(IdDetalleFormula);
+                return cdDetallesFormula.Borrar(IdDetalleFormula);
             }
             catch (Exception er)
             {
@@ -48,7 +54,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().CambiarPrecios(Parametro);
+                return cdDetallesFormula.CambiarPrecios(Parametro);
             }
             catch (Exception er)
             {
@@ -59,7 +65,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().ConsultaGridPorId(IdDetalle);
+                return cdDetallesFormula.ConsultaGridPorId(IdDetalle);
             }
             catch (Exception er)
             {
@@ -70,7 +76,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().ConsultaGridPorFormula(IdFormula);
+                return cdDetallesFormula.ConsultaGridPorFormula(IdFormula);
             }
             catch (Exception er)
             {
@@ -81,7 +87,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().ConsultaGridPorInsumo(IdInsumo);
+                return cdDetallesFormula.ConsultaGridPorInsumo(IdInsumo);
             }
             catch (Exception er)
             {
@@ -92,7 +98,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesFormula().ConsultaGridPorMoneda();
+                return cdDetallesFormula.ConsultaGridPorMoneda();
             }
             catch (Exception er)
             {

@@ -7,12 +7,18 @@ namespace CapaNegocios
 {
     public class CNFamiliaInsumos
     {
+        private readonly CDFamiliaInsumos cdFamiliaInsumos;
+
+        public CNFamiliaInsumos(string conexion)
+        {
+            cdFamiliaInsumos = new CDFamiliaInsumos(conexion);
+        }
         public int Guardar(FamiliaInsumosModel Objeto)
         {
             int res;
             try
             {
-                res = new CDFamiliaInsumos().Guardar(Objeto);
+                res = cdFamiliaInsumos.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -25,7 +31,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFamiliaInsumos().Actualizar(Parametro);
+                return cdFamiliaInsumos.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -36,18 +42,18 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFamiliaInsumos().Borrar(IdFamiliaInsumo);
+                return cdFamiliaInsumos.Borrar(IdFamiliaInsumo);
             }
             catch (Exception er)
             {
                 throw new Exception(er.Message);
             }
         }
-        public DataTable ConsultaGeneral( )
+        public DataTable ConsultaGeneral()
         {
             try
             {
-                return new CDFamiliaInsumos().ConsultaGridGeneral();
+                return cdFamiliaInsumos.ConsultaGridGeneral();
             }
             catch (Exception er)
             {
@@ -58,7 +64,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDFamiliaInsumos().ConsultaGridIndividual(IdFamilia);
+                return cdFamiliaInsumos.ConsultaGridIndividual(IdFamilia);
             }
             catch (Exception er)
             {

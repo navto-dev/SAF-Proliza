@@ -6,12 +6,18 @@ namespace CapaNegocios
 {
     public class CNDetallesProductos
     {
+        private readonly CDDetallesProductos cdDetallesProductos;
+
+        public CNDetallesProductos(string conexion)
+        {
+            cdDetallesProductos = new CDDetallesProductos(conexion);
+        }
         public int Guardar(DetallesProductosModel Objeto)
         {
             int res;
             try
             {
-                res = new CDDetallesProductos().Guardar(Objeto);
+                res = cdDetallesProductos.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -24,7 +30,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesProductos().Actualizar(Parametro);
+                return cdDetallesProductos.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -35,7 +41,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesProductos().Borrar(Parametro);
+                return cdDetallesProductos.Borrar(Parametro);
             }
             catch (Exception er)
             {
@@ -46,7 +52,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesProductos().ConsultaGridPorProducto(IdProducto);
+                return cdDetallesProductos.ConsultaGridPorProducto(IdProducto);
             }
             catch (Exception er)
             {
@@ -57,7 +63,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDDetallesProductos().ConsultaGridPorInsumo(IdInsumo);
+                return cdDetallesProductos.ConsultaGridPorInsumo(IdInsumo);
             }
             catch (Exception er)
             {

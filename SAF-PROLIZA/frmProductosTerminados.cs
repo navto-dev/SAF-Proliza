@@ -6,6 +6,7 @@ using DevExpress.Utils;
 using CapaNegocios;
 using Entidades;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace SAF_PROLIZA
 {
@@ -18,6 +19,10 @@ namespace SAF_PROLIZA
         Dictionary<int, int> Borrados = new Dictionary<int, int>();
         #region "Metodos"
         double Costo = 0.00;
+        private readonly CNFormulas cnFormulas;
+        private readonly CNProductos cnProductos;
+        private readonly CNInsumos cnInsumos;
+        private readonly CNDetallesProductos cnDetallesProductos;
 
         void Limpiar()
         {
@@ -39,7 +44,7 @@ namespace SAF_PROLIZA
             cmbFormula.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("NombreFormula"));
             cmbFormula.Properties.ValueMember = "IdFormula";
             cmbFormula.Properties.DisplayMember = "NombreFormula";
-            cmbFormula.Properties.DataSource = new CNFormulas().ConsultaGeneral();
+            cmbFormula.Properties.DataSource = cnFormulas.ConsultaGeneral();
         }
         void llenarComboInsumos()
         {
@@ -47,11 +52,11 @@ namespace SAF_PROLIZA
             cmbDetalles.Properties.ValueMember = "IdInsumo";
             cmbDetalles.Properties.DisplayMember = "NombreInsumo";
             //cmbDetalles.Properties.DataSource = Objetos.Insumos.ConsultarInsumosDeEmpacado().Tables["Insumos"];
-            cmbDetalles.Properties.DataSource = new CNInsumos().ConsultaInsumosDeEmpacado();
+            cmbDetalles.Properties.DataSource = cnInsumos.ConsultaInsumosDeEmpacado();
         }
         void autoCompleteTextBox()
         {
-            DataTable dt = new CNProductos().ConsultaPorFormula(int.Parse(cmbFormula.EditValue.ToString()));
+            DataTable dt = cnProductos.ConsultaPorFormula(int.Parse(cmbFormula.EditValue.ToString()));
             AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
             foreach (DataRow row in dt.Rows)
             {
@@ -127,7 +132,7 @@ namespace SAF_PROLIZA
         {
             frmProductosTerminados frm = new frmProductosTerminados(false);
             //DataTable dt = Objetos.Productos.ConsultarProductoPorId(Id).Tables["ProductosTerminados"];
-            DataTable dt = new CNProductos().ConsultaConsultaPorId(Id);
+            DataTable dt = cnProductos.ConsultaConsultaPorId(Id);
             if (dt.Rows.Count != 0)
             {
                 frm.cmbFormula.Properties.ReadOnly = true;
@@ -145,7 +150,7 @@ namespace SAF_PROLIZA
                 frm.cmbDetalles.Properties.ReadOnly = false;
                 frm.encendido = true;
                 frm.btnBorrar.Links[0].Visible = true;
-                dt = new CNDetallesProductos().ConsultaDetallesPorProducto(Id);
+                dt = cnDetallesProductos.ConsultaDetallesPorProducto(Id);
                 for (int i = 0; i < dt.Rows.Count; i++)
                     frm.AgregarNuevoRegistro(Convert.ToInt32(dt.Rows[i]["IdDetalle"]), Convert.ToInt32(dt.Rows[i]["IdInsumo"]));
                 frm.llenarGrid(frm.T);
@@ -159,7 +164,7 @@ namespace SAF_PROLIZA
         }
         void llenarComboUnidadMedida()
         {
-            DataTable TI = new CNFormulas().ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
+            DataTable TI = cnFormulas.ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
 
             if (TI.Rows.Count != 0)
             {
@@ -204,26 +209,26 @@ namespace SAF_PROLIZA
         void GuardarDetalle()
         {
             for (int i = 0; i < T.Rows.Count; i++)
-                new CNDetallesProductos().Guardar(AsignaGUIObjetoDetalleProducto(i));
+                cnDetallesProductos.Guardar(AsignaGUIObjetoDetalleProducto(i));
         }
         void ActualizarDetalle()
         {
             foreach (KeyValuePair<int, int> item in Borrados)
-                new CNDetallesProductos().Borrar(new DetallesProductosModel { IdDetalle = item.Key, IdInsumo = item.Value });
+                cnDetallesProductos.Borrar(new DetallesProductosModel { IdDetalle = item.Key, IdInsumo = item.Value });
 
             for (int i = 0; i < T.Rows.Count; i++)
             {
                 if (Convert.ToInt32(T.Rows[i]["IdDetalle"]) == -1)
-                    new CNDetallesProductos().Guardar(AsignaGUIObjetoDetalleProducto(i));
+                    cnDetallesProductos.Guardar(AsignaGUIObjetoDetalleProducto(i));
                 else
-                    new CNDetallesProductos().Actualizar(AsignaGUIObjetoDetalleProducto(i));
+                    cnDetallesProductos.Actualizar(AsignaGUIObjetoDetalleProducto(i));
             }
         }
         private void AgregarNuevoRegistro(int IdDetalle, int IdInsumo)
         {
             //BLL.ActualizadorPrecios Calculador = new BLL.ActualizadorPrecios();
             //DataTable TI = Objetos.Insumos.ConsultarInsumoPorId(IdInsumo).Tables["Insumos"];
-            DataTable TI = new CNInsumos().ConsultaPorId(IdInsumo);
+            DataTable TI = cnInsumos.ConsultaPorId(IdInsumo);
 
             DataRow row = TI.Rows[0];
             if (Convert.ToInt32(row["IdMoneda"]) == 2)
@@ -288,6 +293,11 @@ namespace SAF_PROLIZA
         public frmProductosTerminados(bool encendido)
         {
             InitializeComponent();
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+            cnFormulas = new CNFormulas(connectionString);
+            cnProductos = new CNProductos(connectionString);
+            cnInsumos = new CNInsumos(connectionString, -1, null, false, 0);
+            cnDetallesProductos = new CNDetallesProductos(connectionString);
             HabilitarCampos(false);
             llenarComboFormulas();
             llenarComboInsumos();
@@ -325,7 +335,7 @@ namespace SAF_PROLIZA
 
                     //ActualizadorPrecios Calculador = new ActualizadorPrecios();
                     //DataTable T = Objetos.Formulas.ConsultarFormulaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString())).Tables["Formulas"];
-                    DataTable Formula = new CNFormulas().ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
+                    DataTable Formula = cnFormulas.ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
                     //double Precio = Calculador.calculaPrecioProducto(T.Rows[0]["UnidadMedida"].ToString(), Convert.ToDouble(T.Rows[0]["CostoTotal"].ToString()), Convert.ToDouble(T.Rows[0]["Cantidad"].ToString()), Convert.ToDouble(txtCantidad.Text), cmbUnidadMedida.Text);
                     decimal CostoMinimoFormula = Formula.Rows[0]["UnidadMedida"].ToString().Equals("K") ?
                         (Convert.ToDecimal(Formula.Rows[0]["CostoTotal"]) / (Formula.Rows[0]["Capacidad"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(Formula.Rows[0]["Cantidad"])) :
@@ -366,7 +376,7 @@ namespace SAF_PROLIZA
 
                 //ActualizadorPrecios Calculador = new ActualizadorPrecios();
                 //DataTable T = Objetos.Formulas.ConsultarFormulaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString())).Tables["Formulas"];
-                DataTable Formula = new CNFormulas().ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
+                DataTable Formula = cnFormulas.ConsultaPorId(Convert.ToInt32(cmbFormula.EditValue.ToString()));
                 //double Precio = Calculador.calculaPrecioProducto(T.Rows[0]["UnidadMedida"].ToString(), Convert.ToDouble(T.Rows[0]["CostoTotal"].ToString()), Convert.ToDouble(T.Rows[0]["Cantidad"].ToString()), Convert.ToDouble(txtCantidad.Text), cmbUnidadMedida.Text);
                 decimal CostoMinimoFormula = Formula.Rows[0]["UnidadMedida"].ToString().Equals("K") ?
                     (Convert.ToDecimal(Formula.Rows[0]["CostoTotal"]) / (Formula.Rows[0]["Capacidad"].ToString().ToUpper().StartsWith("K") ? ConversorUnidades.Kilos_Miligramos(Convert.ToDecimal(Formula.Rows[0]["Cantidad"])) :
@@ -403,7 +413,7 @@ namespace SAF_PROLIZA
             if (ds == DialogResult.Yes)
             {
                 //Objetos.Productos.DarDeBajaPorId(this.Id);
-                new CNProductos().Borrar(Id);
+                cnProductos.Borrar(Id);
                 this.Close();
             }
         }
@@ -412,19 +422,19 @@ namespace SAF_PROLIZA
             if (ValidaGUI())
             {
                 //AsignaGUIObjetoProducto();
-                string msj = "";
+                //string msj = "";
                 if (Guarda)
                 {
 
                     //msj = Objetos.Productos.Guardar(Objetos.Productos);
-                    Id = new CNProductos().Guardar(AsignaGUIObjetoProducto());
+                    Id = cnProductos.Guardar(AsignaGUIObjetoProducto());
                     GuardarDetalle();
                     Limpiar();
                 }
                 else
                 {
-                    //new CNProductos().Borrar(Id);
-                    new CNProductos().Actualizar(AsignaGUIObjetoProducto());
+                    //cnProductos.Borrar(Id);
+                    cnProductos.Actualizar(AsignaGUIObjetoProducto());
                     ActualizarDetalle();
                     Limpiar();
                 }

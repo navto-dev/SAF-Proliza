@@ -7,13 +7,19 @@ namespace CapaNegocios
 {
     public class CNProveedores
     {
+        private readonly CDProveedores cdProveedores;
+
+        public CNProveedores(string conexion)
+        {
+            cdProveedores = new CDProveedores(conexion);
+        }
 
         public int Guardar(ProveedoresModel Objeto)
         {
             int res;
             try
             {
-                res = new CDProveedores().Guardar(Objeto);
+                res = cdProveedores.Guardar(Objeto);
             }
             catch (Exception)
             {
@@ -26,7 +32,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProveedores().Actualizar(Parametro);
+                return cdProveedores.Actualizar(Parametro);
             }
             catch (Exception er)
             {
@@ -37,7 +43,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProveedores().Borrar(IdProveedor);
+                return cdProveedores.Borrar(IdProveedor);
             }
             catch (Exception er)
             {
@@ -48,7 +54,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProveedores().ConsultaGridGeneral();
+                return cdProveedores.ConsultaGridGeneral();
             }
             catch (Exception er)
             {
@@ -59,7 +65,7 @@ namespace CapaNegocios
         {
             try
             {
-                return new CDProveedores().ConsultaGridPorId(IdProveedor);
+                return cdProveedores.ConsultaGridPorId(IdProveedor);
             }
             catch (Exception er)
             {

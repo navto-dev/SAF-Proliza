@@ -2,6 +2,7 @@
 using DevExpress.XtraBars;
 using Entidades;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Windows.Forms;
 
@@ -9,16 +10,32 @@ namespace SAF_PROLIZA
 {
     public partial class frmInsumos : DevExpress.XtraBars.Ribbon.RibbonForm
     {
-        UpdatePrices updatePrices = new UpdatePrices();
         double PU = 0; //Salvar el Precio Unitario de la consulta
         bool Guardar = true; //SI la consuta devuelve algo, se convierte a false y no guarda, actualiza.
         int Id = 1;
+        private readonly CNInsumos cnInsumos;
+        private readonly UpdatePrices updatePrices;
+
+        public frmInsumos()
+        {
+            InitializeComponent();
+            string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+            cnInsumos = new CNInsumos(connectionString, -1, null, false, 0);
+            updatePrices = new UpdatePrices(connectionString);
+
+            llenarComboProveedores();
+            llenarComboMonedas();
+            llenarComboFamilia();
+            llenarComboUnidadMedida();
+            HabilitarCampos(false);
+            btnBorrar.Links[0].Visible = false;
+        }
         #region "Métodos"
 
         public void LlenarDatos(int Id)
         {
             //DataRow row = Objetos.Insumos.ConsultarInsumoPorId(Id).Tables["Insumos"].Rows[0];
-            DataRow row = new CNInsumos().ConsultaPorId(Id).Rows[0];
+            DataRow row = cnInsumos.ConsultaPorId(Id).Rows[0];
             frmInsumos frm = new frmInsumos();
             frm.Guardar = false;
             frm.Id = Convert.ToInt32(row["IdInsumo"]);
@@ -45,7 +62,7 @@ namespace SAF_PROLIZA
             //DataTable dt = Insumos.ConsultarInsumoPorProveedor(int.Parse(cmbProveedor.EditValue.ToString())).Tables["Insumos"];
             if (cmbProveedor.EditValue == null)
                 return;
-            DataTable dt = new CNInsumos().ConsultaPorProveedor(int.Parse(cmbProveedor.EditValue.ToString()));
+            DataTable dt = cnInsumos.ConsultaPorProveedor(int.Parse(cmbProveedor.EditValue.ToString()));
             AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
             foreach (DataRow row in dt.Rows)
             {
@@ -61,14 +78,14 @@ namespace SAF_PROLIZA
             cmbProveedor.Properties.ValueMember = "IdProveedor";
             cmbProveedor.Properties.DisplayMember = "NombreProveedor";
             //cmbProveedor.Properties.DataSource = Proveedores.ConsultarProveedores().Tables["Proveedores"];
-            cmbProveedor.Properties.DataSource = new CNProveedores().ConsultaGeneral();
+            cmbProveedor.Properties.DataSource = new CNProveedores(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaGeneral();
         }
         void llenarComboMonedas()
         {
             cmbMoneda.Properties.Columns.Add(new DevExpress.XtraEditors.Controls.LookUpColumnInfo("NombreMoneda"));
             cmbMoneda.Properties.ValueMember = "IdMoneda";
             cmbMoneda.Properties.DisplayMember = "NombreMoneda";
-            cmbMoneda.Properties.DataSource = new CNMonedas().ConsultaGeneral();
+            cmbMoneda.Properties.DataSource = new CNMonedas(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaGeneral();
         }
         void llenarComboFamilia()
         {
@@ -76,7 +93,7 @@ namespace SAF_PROLIZA
             cmbFamilia.Properties.ValueMember = "IdFamilia";
             cmbFamilia.Properties.DisplayMember = "NombreFamilia";
             //cmbFamilia.Properties.DataSource = Familia.ConsultarFamilias().Tables["FamiliaInsumos"];
-            cmbFamilia.Properties.DataSource = new CNFamiliaInsumos().ConsultaGeneral();
+            cmbFamilia.Properties.DataSource = new CNFamiliaInsumos(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaGeneral();
         }
         void llenarComboUnidadMedida()
         {
@@ -86,7 +103,7 @@ namespace SAF_PROLIZA
         void llenarDatos()
         {
             //DataTable dt = Insumos.ConsultarInsumoPorNombre(txtNombreInsumo.Text).Tables["Insumos"];
-            DataTable dt = new CNInsumos().ConsultaPorNombre(txtNombreInsumo.Text);
+            DataTable dt = cnInsumos.ConsultaPorNombre(txtNombreInsumo.Text);
             if (dt.Rows.Count != 0)
             {
                 Guardar = false;
@@ -156,7 +173,7 @@ namespace SAF_PROLIZA
                 UnidadMedida = cmbUnidadMedida.Text.StartsWith("K") ? "KG" : cmbUnidadMedida.Text.StartsWith("L") ? "L" : "P",
                 IdUsuario = Estaticos.IdUsuario,
                 ActualizaFormulas = ActualizarPrecios
-                
+
             };
 
         }
@@ -227,16 +244,7 @@ namespace SAF_PROLIZA
             cmbUnidadMedida.Enabled = estado;
         }
         #endregion
-        public frmInsumos()
-        {
-            InitializeComponent();
-            llenarComboProveedores();
-            llenarComboMonedas();
-            llenarComboFamilia();
-            llenarComboUnidadMedida();
-            HabilitarCampos(false);
-            btnBorrar.Links[0].Visible = false;
-        }
+
         private void btnGuardar_ItemClick(object sender, ItemClickEventArgs e)
         {
             try
@@ -256,7 +264,9 @@ namespace SAF_PROLIZA
                             }
                             else
                                 ActualizarPreciosFormulas = true;
-                        CNInsumos cNInsumos = new CNInsumos(Estaticos.IdUsuario, AsignaGUIObjeto2(ActualizarPreciosFormulas), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
+                        string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
+
+                        CNInsumos cNInsumos = new CNInsumos(connectionString, Estaticos.IdUsuario, AsignaGUIObjeto2(ActualizarPreciosFormulas), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
                         using (waitForm frm = new waitForm(cNInsumos.ActualizarP, "Actualizando precio", "Por favor espere, no tardaremos mucho."))
                         {
                             frm.ShowDialog(this);
@@ -265,7 +275,7 @@ namespace SAF_PROLIZA
                             throw new Exception(cNInsumos.Msj);
                     }
                     else
-                        new CNInsumos().Guardar(AsignaGUIObjeto2(true));
+                        cnInsumos.Guardar(AsignaGUIObjeto2(true));
 
                     Limpiar();
                     HabilitarCampos(false);
@@ -295,9 +305,9 @@ namespace SAF_PROLIZA
         private void btnBorrar_ItemClick(object sender, ItemClickEventArgs e)
         {
             //DataTable BuscaInsumos = Objetos.DetallesFormulas.ConsultarDetallePorInsumo(Id).Tables["DetallesFormulas"];
-            DataTable BuscaInsumos = new CNDetallesFormulas().ConsultaPorInsumo(Id);
+            DataTable BuscaInsumos = new CNDetallesFormulas(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaPorInsumo(Id);
             //DataTable InsumosEnProductos = Objetos.DetallesProductos.ConsultarDetallesPorInsumo(Id).Tables["DetallesProductos"];
-            DataTable InsumosEnProductos = new CNDetallesProductos().ConsultaDetallesPorInsumo(Id);
+            DataTable InsumosEnProductos = new CNDetallesProductos(ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString).ConsultaDetallesPorInsumo(Id);
             if (BuscaInsumos.Rows.Count == 0 && InsumosEnProductos.Rows.Count == 0)
             {
                 DialogResult ds = MessageBox.Show("¿Estas seguro que deseas eliminar '" + txtNombreInsumo.Text + "' ?",
@@ -305,8 +315,8 @@ namespace SAF_PROLIZA
                 if (ds == DialogResult.Yes)
                 {
                     //Objetos.Insumos.DarDeBajaPorId(this.Id);
-                    new CNInsumos().Borrar(this.Id);
-                    this.Close();
+                    cnInsumos.Borrar(this.Id);
+                    Close();
                 }
             }
             else

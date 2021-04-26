@@ -1,21 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CapaDatos
 {
     public class respaldo
     {
+        private string conexion { get; set; }
+
+        public respaldo(string conexion)
+        {
+            this.conexion = conexion ?? throw new ArgumentNullException(nameof(conexion));
+        }
+
         public void DoLocalBackup(string AremoteTempPath, string AlocalPath)
         {
             try
             {
-                SqlConnection _conn = new SqlConnection(AConexion.con);
+                SqlConnection _conn = new SqlConnection(conexion);
                 string _dbname = "sdproliza_dev";
                 if (_conn == null)
                     return;
