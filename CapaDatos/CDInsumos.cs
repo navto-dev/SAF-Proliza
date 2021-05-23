@@ -80,7 +80,31 @@ namespace CapaDatos
 
             return res;
         }
+        public int Actualizar(int IdInsumo, double Precio)
+        {
+            int res;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(conexion))
+                {
+                    using (SqlCommand cmd = new SqlCommand("spInsumosActualizaPrecio", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@IdInsumo", SqlDbType.Int).Value = IdInsumo;
+                        cmd.Parameters.Add("@PrecioUnitario", SqlDbType.Decimal).Value = Precio;
+                        con.Open();
+                        res = Convert.ToInt32(cmd.ExecuteScalar());
+                        con.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error: " + ex.Message);
+            }
 
+            return res;
+        }
         public int ActualizarV2(InsumosModel Objeto)
         {
             DataTable tabla = new DataTable();

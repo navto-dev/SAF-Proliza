@@ -267,7 +267,7 @@ namespace SAF_PROLIZA
                         string connectionString = ConfigurationManager.ConnectionStrings["sdprolizaEntitiessp"].ConnectionString;
 
                         CNInsumos cNInsumos = new CNInsumos(connectionString, Estaticos.IdUsuario, AsignaGUIObjeto2(ActualizarPreciosFormulas), ActualizarPreciosFormulas, Convert.ToInt32(cmbMoneda.EditValue) == 2 ? Convert.ToDecimal(Estaticos.dolar) : 1);
-                        using (waitForm frm = new waitForm(cNInsumos.ActualizarP, "Actualizando precio", "Por favor espere, no tardaremos mucho."))
+                        using (waitForm frm = new waitForm(cNInsumos.ActualizarPv2, "Actualizando precio", "Por favor espere, no tardaremos mucho."))
                         {
                             frm.ShowDialog(this);
                         }

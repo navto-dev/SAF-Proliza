@@ -10,9 +10,9 @@ namespace SAF_PROLIZA
         public waitForm(Action worker, string titulo, string descripcion)
         {
             InitializeComponent();
-            if (worker == null)
-                throw new ArgumentNullException();
-            Worker = worker;
+            //if (worker == null)
+            //    throw new ArgumentNullException();
+            Worker = worker ?? throw new ArgumentNullException();
             lblDescription.Text = descripcion;
             lblTitulo.Text = titulo;
             lblDescription.SelectionStart = lblDescription.SelectionLength;
