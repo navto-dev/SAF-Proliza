@@ -56,7 +56,7 @@ namespace CapaDatos
                         cmd.Parameters.Add("@IdInsumo", SqlDbType.Int).Value = Objeto.IdInsumo;
                         cmd.Parameters.Add("@IdProducto", SqlDbType.Int).Value = Objeto.IdProducto;
                         cmd.Parameters.Add("@CostoInsumo", SqlDbType.Decimal).Value = Objeto.CostoInsumo;
-                        cmd.Parameters.Add("@DetalleAccion", SqlDbType.VarChar).Value = "A";
+                        cmd.Parameters.Add("@DetalleAccion", SqlDbType.Char).Value = 'A';
                         con.Open();
                         res = Convert.ToInt32(cmd.ExecuteScalar());
                         con.Close();
